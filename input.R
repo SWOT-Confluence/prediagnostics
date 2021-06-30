@@ -12,11 +12,11 @@ library(rjson)
 #'
 #' @return named list of reach files associate with reach identifier
 get_reach_files <- function(reaches_json, input_dir, index) {
-  json_data <- fromJSON(file=paste(input_dir, reaches_json, sep='/'))[[index]]
+  json_data <- fromJSON(file=paste(input_dir, reaches_json, sep='\\'))[[index]]
   return(list(reach_id=json_data$reach_id, 
-              swot_reach=paste(input_dir, "swot", json_data$swot_reach, sep='/'),
-              swot_node=paste(input_dir, "swot", json_data$swot_node, sep='/'), 
-              sos=paste(input_dir, "sos", json_data$sos, sep='/')
+              swot_reach=paste(input_dir, "swot", json_data$swot_reach, sep='\\'),
+              swot_node=paste(input_dir, "swot", json_data$swot_node, sep='\\'), 
+              sos=paste(input_dir, "sos", json_data$sos, sep='\\')
   ))
 }
 

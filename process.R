@@ -1,3 +1,7 @@
+setwd("D:\\OneDrive -\ University of Massachusetts\\Active papers\\prediagnostics\\")
+
+
+
 source("input.R")
 source("output.R")
 
@@ -26,12 +30,12 @@ get_input <- function(input_dir) {
 #' @param data named list of reach and node dataframes
 #'
 #' @return named list of reach and node dataframes
-run_diagnostics <- function(data) {
-  ## Do Stuff
-}
+
 
 # Run the program
-input_dir <- "/home/nikki/Documents/confluence/workspace/diagnostics/data"    # CHANGE ME
+input_dir <- "D:\\OneDrive -\ University of Massachusetts\\Active papers\\prediagnostics\\data"    # CHANGE ME
 data <- get_input(input_dir)
+
+
 data <- run_diagnostics(input_dir)
 write_data(data)
