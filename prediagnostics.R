@@ -1,5 +1,13 @@
-#seasame street filter
-seasame_street=function(data,Tukey_number){
+source("input.R")
+source("output.R")
+
+#' Apply filter to determine data outliers
+#'
+#' @param data dataframe
+#' @param Tukey_number 
+#'
+#' @return dataframe
+sesame_street=function(data,Tukey_number){
   Wobs=data$width
   Hobs=data$wse
   Sobs=data$slope
@@ -35,7 +43,14 @@ seasame_street=function(data,Tukey_number){
   
 }
 
-#flag pass
+#' Identify and apply flags to reach-level data
+#'
+#' @param data dataframe of reach data
+#' @param dark_thresh 
+#' @param node_thresh 
+#' @param obs_thresh 
+#'
+#' @return dataframe of reach data
 apply_flags_reach=function(data,dark_thresh, node_thresh, obs_thresh){
   
   flag1=data$ice_clim_f
@@ -80,6 +95,12 @@ apply_flags_reach=function(data,dark_thresh, node_thresh, obs_thresh){
   
 }
 
+#' Identify and apply flags to reach-level data
+#'
+#' @param data dataframe of node-level data
+#' @param dark_thresh 
+#'
+#' @return dataframe of node-level data
 apply_flags_node=function(data,dark_thresh){
   
   flag1=data$ice_clim_f
@@ -90,29 +111,55 @@ apply_flags_node=function(data,dark_thresh){
   flag1[is.na(flag1)]=0
   flag2[is.na(flag2)]=0
   flag3[is.na(flag3)]=0
-
   
   #make non binary flags binary
   flag3[flag3<dark_thresh]=0
   flag3[flag3>dark_thresh]=1  
-
   
   #make a giant flag
   master_flag=flag1*flag2*flag3
   
   Wobs=data$width
   Hobs=data$wse
-  Sobs=data$slope
+  # Sobs=data$slope
   
   Wobs[master_flag]=NA
   Hobs[master_flag]=NA
-  Sobs[master_flag]=NA
+  # Sobs[master_flag]=NA
   
   data$width=Wobs
   data$wse=Hobs
-  data$slope=Sobs
+  # data$slope=Sobs
   
   return(data)
   
 }
 
+#' Run diagnostics on SWOT data
+run_diagnostics <- function() {
+  
+  # Retrieve input data
+  input_dir <- "/home/nikki/Documents/confluence/workspace/diagnostics/pre_data"   ## CHANGE ME
+  args <- commandArgs(trailingOnly=TRUE)
+  # reaches_json <- ifelse(is.null(args), "reaches.json", args[1])
+  reaches_json <- "reaches.json"
+  # index <- strtoi(Sys.getenv("AWS_BATCH_JOB_ARRAY_INDEX")) + 1 ## TODO for container
+  index <- 7
+  reach_files <- get_reach_files(reaches_json, input_dir, index)
+  data <- get_data(reach_files)
+  
+  # Apply flags to reach and node data
+  reach_df <- apply_flags_reach(data$reach_df, 1, 1, 1)
+  node_df <- apply_flags_node(data$node_df, 1)
+  
+  # Apply sesame street filter to reach and node data
+  reach_df <- sesame_street(reach_df, 1)
+  node_df <- sesame_street(node_df, 1)
+  
+  # Write output of diagnostics
+  write_data(reach_df, node_df, reach_files)
+  message("Node and reach files written.")
+  
+}
+
+run_diagnostics()

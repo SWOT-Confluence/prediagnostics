@@ -3,8 +3,8 @@ library(rjson)
 
 #' Get reach files for a reach identifier
 #' 
-#' The reach identifier is determined from the Batch array index number which 
-#' is used to select an element from the JSON list. 
+#' The reach identifier is determined from the index number which is used to 
+#' select an element from the JSON list.  
 #'
 #' @param reaches_json string path to JSON file with reach data
 #' @param input_dir string path to input directory
@@ -12,11 +12,11 @@ library(rjson)
 #'
 #' @return named list of reach files associate with reach identifier
 get_reach_files <- function(reaches_json, input_dir, index) {
-  json_data <- fromJSON(file=paste(input_dir, reaches_json, sep='\\'))[[index]]
+  json_data <- fromJSON(file=file.path(input_dir, reaches_json))[[index]]
   return(list(reach_id=json_data$reach_id, 
-              swot_reach=paste(input_dir, "swot", json_data$swot_reach, sep='\\'),
-              swot_node=paste(input_dir, "swot", json_data$swot_node, sep='\\'), 
-              sos=paste(input_dir, "sos", json_data$sos, sep='\\')
+              swot_reach=file.path(input_dir, "swot", json_data$swot_reach),
+              swot_node=file.path(input_dir, "swot", json_data$swot_node), 
+              sos=file.path(input_dir, "sos", json_data$sos)
   ))
 }
 
@@ -38,7 +38,7 @@ get_data <- function(reach_files) {
 #' Retrieve node data from node_file using reach_id as an index
 #'
 #' @param node_file string path to node file
-#' @param reach_id integer reach identifier
+#' @param reach_id float reach identifier
 #'
 #' @return dataframe of node data
 get_node_data <- function(node_file, reach_id) {
@@ -49,7 +49,7 @@ get_node_data <- function(node_file, reach_id) {
   indexes <- which(reach_ids==reach_id, arr.ind=TRUE)
   
   # Use index to retrieve corresponding data variables
-  node_ids <- ncvar_get(node, "node_id")[indexes]
+  node_id <- ncvar_get(node, "node_id")[indexes]
   width <- ncvar_get(node, "width")[indexes]
   wse <- ncvar_get(node, "wse")[indexes]
   node_q <- ncvar_get(node, "node_q")[indexes]
@@ -59,9 +59,10 @@ get_node_data <- function(node_file, reach_id) {
   partial_f <- ncvar_get(node, "partial_f")[indexes]
   n_good_pix <- ncvar_get(node, "n_good_pix")[indexes]
   xovr_cal_q <- ncvar_get(node, "xovr_cal_q")[indexes]
+  nc_close(node)
   
   return(data.frame(reach_id = reach_id, 
-                    node_ids = node_ids,
+                    node_id = node_id,
                     width = width, 
                     wse = wse, 
                     node_q = node_q,
@@ -99,6 +100,7 @@ get_reach_data <- function(reach_file, reach_id) {
   n_good_nod <- ncvar_get(reach, "n_good_nod")[index]
   obs_frac_n <- ncvar_get(reach, "obs_frac_n")[index]
   xovr_cal_q <- ncvar_get(reach, "xovr_cal_q")[index]
+  nc_close(reach)
   
   return(data.frame(reach_id = reach_id, 
                     width = width, 
