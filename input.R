@@ -22,17 +22,17 @@ get_reach_files <- function(reaches_json, input_dir, index) {
 
 #' Get and store data from reach and node files
 #' 
-#' Data is stored in a reach-level dataframe and node-level dataframe.
+#' Data is stored in a reach-level named list and node-level named list.
 #'
 #' @param reach_files named list of files associated with reach
 #'
-#' @return named list of node dataframe and reach dataframe
+#' @return named list of node named list and reach named list
 get_data <- function(reach_files) {
   
-  reach_df <- get_reach_data(reach_files$swot_reach, reach_files$reach_id)
-  node_df <- get_node_data(reach_files$swot_node, reach_files$reach_id)
+  reach_list <- get_reach_data(reach_files$swot_reach, reach_files$reach_id)
+  node_list <- get_node_data(reach_files$swot_node, reach_files$reach_id)
   
-  return(list(reach_df=reach_df, node_df=node_df))
+  return(list(reach_list=reach_list, node_list=node_list))
 }
 
 #' Retrieve node data from node_file using reach_id as an index
@@ -40,7 +40,7 @@ get_data <- function(reach_files) {
 #' @param node_file string path to node file
 #' @param reach_id float reach identifier
 #'
-#' @return dataframe of node data
+#' @return named list of node data
 get_node_data <- function(node_file, reach_id) {
   
   # Open node file and get index of reach identifier
@@ -62,7 +62,7 @@ get_node_data <- function(node_file, reach_id) {
   xovr_cal_q <- t(ncvar_get(node, "xovr_cal_q")[,indexes])
   nc_close(node)
   
-  return(data.frame(reach_id = reach_id, 
+  return(list(reach_id = reach_id, 
                     node_id = node_id,
                     slope = slope,
                     width = width, 
@@ -83,7 +83,7 @@ get_node_data <- function(node_file, reach_id) {
 #' @param reach_file string path to reach file
 #' @param reach_id integer reach identifier
 #'
-#' @return dataframe of reach data
+#' @return named list of reach data
 get_reach_data <- function(reach_file, reach_id) {
   # Open reach file and get index of reach identifier
   reach <- nc_open(reach_file)
@@ -104,7 +104,7 @@ get_reach_data <- function(reach_file, reach_id) {
   xovr_cal_q <- ncvar_get(reach, "xovr_cal_q")[,index]
   nc_close(reach)
   
-  return(data.frame(reach_id = reach_id, 
+  return(list(reach_id = reach_id, 
                     width = width, 
                     wse = wse, 
                     slope = slope,

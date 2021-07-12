@@ -1,6 +1,3 @@
-source("input.R")
-source("output.R")
-
 #' Apply filter to determine data outliers
 #'
 #' @param data dataframe
@@ -136,33 +133,28 @@ apply_flags_node=function(data,dark_thresh){
 }
 
 #' Run diagnostics on SWOT data
-run_diagnostics <- function() {
+#'
+#' @param input_dir string path to input directory
+run_diagnostics <- function(input_dir) {
   
   # Retrieve input data
-  input_dir <- "/home/nikki/Documents/confluence/workspace/diagnostics/pre_data"   ## CHANGE ME
   args <- commandArgs(trailingOnly=TRUE)
   # reaches_json <- ifelse(is.null(args), "reaches.json", args[1])
   reaches_json <- "reaches.json"
   # index <- strtoi(Sys.getenv("AWS_BATCH_JOB_ARRAY_INDEX")) + 1 ## TODO for container
-  index <- 10
+  index <- 25
   reach_files <- get_reach_files(reaches_json, input_dir, index)
   data <- get_data(reach_files)
   
   # Apply flags to reach and node data
-  reach_df <- apply_flags_reach(data$reach_df, 1, 1, 1)
-  node_df <- apply_flags_node(data$node_df, 1)
+  reach_list <- apply_flags_reach(data$reach_list, 1, 1, 1)
+  node_list <- apply_flags_node(data$node_list, 1)
   
   # Apply sesame street filter to reach and node data
-  reach_df <- sesame_street(reach_df, 1)
-  node_df <- sesame_street(node_df, 1)
+  reach_list <- sesame_street(reach_list, 1)
+  node_list <- sesame_street(node_list, 1)
   
   # Write output of diagnostics
-  write_data(reach_df, node_df, reach_files)
+  write_data(reach_list, node_list, reach_files)
   message("Node and reach files written.")
-  
 }
-
-start <- Sys.time()
-run_diagnostics()
-end <- Sys.time()
-print(paste0("Execution time: ", end - start))
