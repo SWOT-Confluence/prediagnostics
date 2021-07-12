@@ -50,19 +50,21 @@ get_node_data <- function(node_file, reach_id) {
   
   # Use index to retrieve corresponding data variables
   node_id <- ncvar_get(node, "node_id")[indexes]
-  width <- ncvar_get(node, "width")[indexes]
-  wse <- ncvar_get(node, "wse")[indexes]
-  node_q <- ncvar_get(node, "node_q")[indexes]
-  dark_frac <- ncvar_get(node, "dark_frac")[indexes]
-  ice_clim_f <- ncvar_get(node, "ice_clim_f")[indexes]
-  ice_dyn_f <- ncvar_get(node, "ice_dyn_f")[indexes]
-  partial_f <- ncvar_get(node, "partial_f")[indexes]
-  n_good_pix <- ncvar_get(node, "n_good_pix")[indexes]
-  xovr_cal_q <- ncvar_get(node, "xovr_cal_q")[indexes]
+  slope <- t(ncvar_get(node, "slope2")[,indexes])
+  width <- t(ncvar_get(node, "width")[,indexes])
+  wse <- t(ncvar_get(node, "wse")[,indexes])
+  node_q <- t(ncvar_get(node, "node_q")[,indexes])
+  dark_frac <- t(ncvar_get(node, "dark_frac")[,indexes])
+  ice_clim_f <- t(ncvar_get(node, "ice_clim_f")[,indexes])
+  ice_dyn_f <- t(ncvar_get(node, "ice_dyn_f")[,indexes])
+  partial_f <- t(ncvar_get(node, "partial_f")[,indexes])
+  n_good_pix <- t(ncvar_get(node, "n_good_pix")[,indexes])
+  xovr_cal_q <- t(ncvar_get(node, "xovr_cal_q")[,indexes])
   nc_close(node)
   
   return(data.frame(reach_id = reach_id, 
                     node_id = node_id,
+                    slope = slope,
                     width = width, 
                     wse = wse, 
                     node_q = node_q,
@@ -89,17 +91,17 @@ get_reach_data <- function(reach_file, reach_id) {
   index <- which(reach_ids==reach_id, arr.ind=TRUE)
   
   # Use index to retrieve corresponding data variables
-  width <- ncvar_get(reach, "width")[index]
-  wse <- ncvar_get(reach, "wse")[index]
-  slope <- ncvar_get(reach, "slope2")[index]
-  reach_q <- ncvar_get(reach, "reach_q")[index]
-  dark_frac <- ncvar_get(reach, "dark_frac")[index]
-  ice_clim_f <- ncvar_get(reach, "ice_clim_f")[index]
-  ice_dyn_f <- ncvar_get(reach, "ice_dyn_f")[index]
-  partial_f <- ncvar_get(reach, "partial_f")[index]
-  n_good_nod <- ncvar_get(reach, "n_good_nod")[index]
-  obs_frac_n <- ncvar_get(reach, "obs_frac_n")[index]
-  xovr_cal_q <- ncvar_get(reach, "xovr_cal_q")[index]
+  width <- ncvar_get(reach, "width")[,index]
+  wse <- ncvar_get(reach, "wse")[,index]
+  slope <- ncvar_get(reach, "slope2")[,index]
+  reach_q <- ncvar_get(reach, "reach_q")[,index]
+  dark_frac <- ncvar_get(reach, "dark_frac")[,index]
+  ice_clim_f <- ncvar_get(reach, "ice_clim_f")[,index]
+  ice_dyn_f <- ncvar_get(reach, "ice_dyn_f")[,index]
+  partial_f <- ncvar_get(reach, "partial_f")[,index]
+  n_good_nod <- ncvar_get(reach, "n_good_nod")[,index]
+  obs_frac_n <- ncvar_get(reach, "obs_frac_n")[,index]
+  xovr_cal_q <- ncvar_get(reach, "xovr_cal_q")[,index]
   nc_close(reach)
   
   return(data.frame(reach_id = reach_id, 
