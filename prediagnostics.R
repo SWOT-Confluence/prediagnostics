@@ -121,15 +121,15 @@ apply_flags_node=function(data,dark_thresh){
   
   Wobs=data$width
   Hobs=data$wse
-  # Sobs=data$slope
+  Sobs=data$slope
   
   Wobs[master_flag]=NA
   Hobs[master_flag]=NA
-  # Sobs[master_flag]=NA
+  Sobs[master_flag]=NA
   
   data$width=Wobs
   data$wse=Hobs
-  # data$slope=Sobs
+  data$slope=Sobs
   
   return(data)
   
@@ -144,7 +144,7 @@ run_diagnostics <- function() {
   # reaches_json <- ifelse(is.null(args), "reaches.json", args[1])
   reaches_json <- "reaches.json"
   # index <- strtoi(Sys.getenv("AWS_BATCH_JOB_ARRAY_INDEX")) + 1 ## TODO for container
-  index <- 7
+  index <- 10
   reach_files <- get_reach_files(reaches_json, input_dir, index)
   data <- get_data(reach_files)
   
@@ -162,4 +162,7 @@ run_diagnostics <- function() {
   
 }
 
+start <- Sys.time()
 run_diagnostics()
+end <- Sys.time()
+print(paste0("Execution time: ", end - start))

@@ -23,6 +23,10 @@ write_node_data <- function(node_df, swot, reach_id) {
   reach_ids <- ncvar_get(node, "reach_id")
   indexes <- which(reach_ids==reach_id, arr.ind=TRUE)
   
+  slope <- ncvar_get(node, "slope2")
+  slope[indexes] <- node_df$slope
+  ncvar_put(node, "slope2", slope)
+  
   width <- ncvar_get(node, "width")
   width[indexes] <- node_df$width
   ncvar_put(node, "width", width)
