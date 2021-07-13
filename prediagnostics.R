@@ -139,22 +139,22 @@ run_diagnostics <- function(input_dir) {
   
   # Retrieve input data
   args <- commandArgs(trailingOnly=TRUE)
-  # reaches_json <- ifelse(is.null(args), "reaches.json", args[1])
+  # reaches_json <- ifelse(identical(args, character(0)), "reaches.json", args[1])
   reaches_json <- "reaches.json"
   # index <- strtoi(Sys.getenv("AWS_BATCH_JOB_ARRAY_INDEX")) + 1 ## TODO for container
-  index <- 25
+  index <- 41
   reach_files <- get_reach_files(reaches_json, input_dir, index)
   data <- get_data(reach_files)
-  
+
   # Apply flags to reach and node data
   reach_list <- apply_flags_reach(data$reach_list, 1, 1, 1)
   node_list <- apply_flags_node(data$node_list, 1)
-  
+
   # Apply sesame street filter to reach and node data
   reach_list <- sesame_street(reach_list, 1)
   node_list <- sesame_street(node_list, 1)
-  
+
   # Write output of diagnostics
-  write_data(reach_list, node_list, reach_files)
+  write_data(reach_list, node_list, reach_files$swot)
   message("Node and reach files written.")
 }
