@@ -135,26 +135,34 @@ apply_flags_node=function(data,dark_thresh){
 #' Run diagnostics on SWOT data
 #'
 #' @param input_dir string path to input directory
-run_diagnostics <- function(input_dir) {
+#' @param string name of JSON reach file
+run_diagnostics <- function(input_dir, reaches_json) {
   
   # Retrieve input data
-  args <- commandArgs(trailingOnly=TRUE)
-  # reaches_json <- ifelse(identical(args, character(0)), "reaches.json", args[1])
-  reaches_json <- "reaches.json"
   # index <- strtoi(Sys.getenv("AWS_BATCH_JOB_ARRAY_INDEX")) + 1 ## TODO for container
-  index <- 41
+  index <- 14
   reach_files <- get_reach_files(reaches_json, input_dir, index)
   data <- get_data(reach_files)
-
-  # Apply flags to reach and node data
-  reach_list <- apply_flags_reach(data$reach_list, 1, 1, 1)
-  node_list <- apply_flags_node(data$node_list, 1)
-
-  # Apply sesame street filter to reach and node data
-  reach_list <- sesame_street(reach_list, 1)
-  node_list <- sesame_street(node_list, 1)
-
-  # Write output of diagnostics
-  write_data(reach_list, node_list, reach_files$swot)
-  message("Node and reach files written.")
+  
+  # Check if data is valid
+  width <- data$reach_list$width[!is.na(data$reach_list$width)]
+  wse <- data$reach_list$wse[!is.na(data$reach_list$wse)]
+  slope <- data$reach_list$slope[!is.na(data$reach_list$slope)]
+  if (length(width) != 0 || length(wse) != 0 || length(slope) != 0) {
+    
+    # Apply flags to reach and node data
+    reach_list <- apply_flags_reach(data$reach_list, 1, 1, 1)
+    node_list <- apply_flags_node(data$node_list, 1)
+    
+    # Apply sesame street filter to reach and node data
+    reach_list <- sesame_street(reach_list, 1.5)
+    node_list <- sesame_street(node_list, 1.5)
+    
+    # Write output of diagnostics
+    write_data(reach_list, node_list, reach_files$swot)
+    message(paste0(reach_files$reach_id, ": Node and reach files overwritten."))
+  
+    } else {
+    message(paste0(reach_files$reach_id, ": Invalid data; node and reach files not modified."))
+  }
 }
