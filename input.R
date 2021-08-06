@@ -1,4 +1,4 @@
-library(ncdf4)
+library(RNetCDF)
 library(rjson)
 
 #' Get reach files for a reach identifier
@@ -26,10 +26,10 @@ get_reach_files <- function(reaches_json, input_dir, index) {
 #' @return named list of node named list and reach named list
 get_data <- function(reach_files) {
   
-  swot <- nc_open(reach_files$swot)
+  swot <- open.nc(reach_files$swot)
   reach_list <- get_reach_data(swot, reach_files$reach_id)
   node_list <- get_node_data(swot, reach_files$reach_id)
-  nc_close(swot)
+  close.nc(swot)
   
   return(list(reach_list=reach_list, node_list=node_list))
 }
@@ -42,18 +42,19 @@ get_data <- function(reach_files) {
 #' @return named list of node data
 get_node_data <- function(swot, reach_id) {
   
+  node_grp = grp.inq.nc(swot, "node")$self
   return(list(reach_id = reach_id, 
-                    node_id = ncvar_get(swot, "node/node_id"),
-                    slope = t(ncvar_get(swot, "node/slope2")),
-                    width = t(ncvar_get(swot, "node/width")), 
-                    wse = t(ncvar_get(swot, "node/wse")), 
-                    node_q = t(ncvar_get(swot, "node/node_q")),
-                    dark_frac = t(ncvar_get(swot, "node/dark_frac")),
-                    ice_clim_f = t(ncvar_get(swot, "node/ice_clim_f")),
-                    ice_dyn_f = t(ncvar_get(swot, "node/ice_dyn_f")),
-                    partial_f = t(ncvar_get(swot, "node/partial_f")),
-                    n_good_pix = t(ncvar_get(swot, "node/n_good_pix")),
-                    xovr_cal_q = t(ncvar_get(swot, "node/xovr_cal_q"))
+                    node_id = var.get.nc(node_grp, "node_id"),
+                    slope = var.get.nc(node_grp, "slope2"),
+                    width = var.get.nc(node_grp, "width"), 
+                    wse = var.get.nc(node_grp, "wse"), 
+                    node_q = var.get.nc(node_grp, "node_q"),
+                    dark_frac = var.get.nc(node_grp, "dark_frac"),
+                    ice_clim_f = var.get.nc(node_grp, "ice_clim_f"),
+                    ice_dyn_f = var.get.nc(node_grp, "ice_dyn_f"),
+                    partial_f = var.get.nc(node_grp, "partial_f"),
+                    n_good_pix = var.get.nc(node_grp, "n_good_pix"),
+                    xovr_cal_q = var.get.nc(node_grp, "xovr_cal_q")
   ))
   
 }
@@ -66,17 +67,18 @@ get_node_data <- function(swot, reach_id) {
 #' @return named list of reach data
 get_reach_data <- function(swot, reach_id) {
   
+  reach_grp = grp.inq.nc(swot, "reach")$self
   return(list(reach_id = reach_id, 
-                    width = ncvar_get(swot, "reach/width"), 
-                    wse = ncvar_get(swot, "reach/wse"), 
-                    slope = ncvar_get(swot, "reach/slope2"),
-                    reach_q = ncvar_get(swot, "reach/reach_q"),
-                    dark_frac = ncvar_get(swot, "reach/dark_frac"),
-                    ice_clim_f = ncvar_get(swot, "reach/ice_clim_f"),
-                    ice_dyn_f = ncvar_get(swot, "reach/ice_dyn_f"),
-                    partial_f = ncvar_get(swot, "reach/partial_f"),
-                    n_good_nod = ncvar_get(swot, "reach/n_good_nod"),
-                    obs_frac_n = ncvar_get(swot, "reach/obs_frac_n"),
-                    xovr_cal_q = ncvar_get(swot, "reach/xovr_cal_q")
+                    width = var.get.nc(reach_grp, "width"), 
+                    wse = var.get.nc(reach_grp, "wse"), 
+                    slope = var.get.nc(reach_grp, "slope2"),
+                    reach_q = var.get.nc(reach_grp, "reach_q"),
+                    dark_frac = var.get.nc(reach_grp, "dark_frac"),
+                    ice_clim_f = var.get.nc(reach_grp, "ice_clim_f"),
+                    ice_dyn_f = var.get.nc(reach_grp, "ice_dyn_f"),
+                    partial_f = var.get.nc(reach_grp, "partial_f"),
+                    n_good_nod = var.get.nc(reach_grp, "n_good_nod"),
+                    obs_frac_n = var.get.nc(reach_grp, "obs_frac_n"),
+                    xovr_cal_q = var.get.nc(reach_grp, "xovr_cal_q")
   ))
 }

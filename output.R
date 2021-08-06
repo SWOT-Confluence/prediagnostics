@@ -1,4 +1,4 @@
-library(ncdf4)
+library(RNetCDF)
 
 #' Writes processed data to appropriate NetCDF file
 #'
@@ -7,14 +7,16 @@ library(ncdf4)
 #' @param swot_file string path to swot file
 write_data <- function(reach_list, node_list, swot_file) {
   
-  swot <- nc_open(swot_file, write=TRUE)
+  swot <- open.nc(swot_file, write=TRUE)
   # Reach
-  ncvar_put(swot, "reach/slope2", reach_list$slope)
-  ncvar_put(swot, "reach/width", reach_list$width)
-  ncvar_put(swot, "reach/wse", reach_list$wse)
+  reach_grp = grp.inq.nc(swot, "reach")$self
+  var.put.nc(reach_grp, "slope2", reach_list$slope)
+  var.put.nc(reach_grp, "width", reach_list$width)
+  var.put.nc(reach_grp, "wse", reach_list$wse)
   # Node
-  ncvar_put(swot, "node/slope2", node_list$slope)
-  ncvar_put(swot, "node/width", node_list$width)
-  ncvar_put(swot, "node/wse", node_list$wse)
-  nc_close(swot)
+  node_grp = grp.inq.nc(swot, "node")$self
+  var.put.nc(node_grp, "slope2", node_list$slope)
+  var.put.nc(node_grp, "width", node_list$width)
+  var.put.nc(node_grp, "wse", node_list$wse)
+  close.nc(swot)
 }
