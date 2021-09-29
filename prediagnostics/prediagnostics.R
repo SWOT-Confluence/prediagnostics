@@ -139,8 +139,7 @@ apply_flags_node=function(data,dark_thresh){
 run_diagnostics <- function(input_dir, reaches_json) {
   
   # Retrieve input data
-  # index <- strtoi(Sys.getenv("AWS_BATCH_JOB_ARRAY_INDEX")) + 1 ## TODO for container
-  index <- 14
+  index <- strtoi(Sys.getenv("AWS_BATCH_JOB_ARRAY_INDEX")) + 1
   reach_files <- get_reach_files(reaches_json, input_dir, index)
   data <- get_data(reach_files)
   

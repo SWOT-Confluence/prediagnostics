@@ -15,8 +15,8 @@ write_data <- function(reach_list, node_list, swot_file) {
   var.put.nc(reach_grp, "wse", reach_list$wse)
   # Node
   node_grp = grp.inq.nc(swot, "node")$self
-  var.put.nc(node_grp, "slope2", node_list$slope)
-  var.put.nc(node_grp, "width", node_list$width)
-  var.put.nc(node_grp, "wse", node_list$wse)
+  var.put.nc(node_grp, "slope2", t(node_list$slope))
+  var.put.nc(node_grp, "width", t(node_list$width))
+  var.put.nc(node_grp, "wse", t(node_list$wse))
   close.nc(swot)
 }

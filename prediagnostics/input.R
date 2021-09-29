@@ -44,17 +44,17 @@ get_node_data <- function(swot, reach_id) {
   
   node_grp = grp.inq.nc(swot, "node")$self
   return(list(reach_id = reach_id, 
-                    node_id = var.get.nc(node_grp, "node_id"),
-                    slope = var.get.nc(node_grp, "slope2"),
-                    width = var.get.nc(node_grp, "width"), 
-                    wse = var.get.nc(node_grp, "wse"), 
-                    node_q = var.get.nc(node_grp, "node_q"),
-                    dark_frac = var.get.nc(node_grp, "dark_frac"),
-                    ice_clim_f = var.get.nc(node_grp, "ice_clim_f"),
-                    ice_dyn_f = var.get.nc(node_grp, "ice_dyn_f"),
-                    partial_f = var.get.nc(node_grp, "partial_f"),
-                    n_good_pix = var.get.nc(node_grp, "n_good_pix"),
-                    xovr_cal_q = var.get.nc(node_grp, "xovr_cal_q")
+                    node_id = t(var.get.nc(node_grp, "node_id")),
+                    slope = t(var.get.nc(node_grp, "slope2")),
+                    width = t(var.get.nc(node_grp, "width")), 
+                    wse = t(var.get.nc(node_grp, "wse")), 
+                    node_q = t(var.get.nc(node_grp, "node_q")),
+                    dark_frac = t(var.get.nc(node_grp, "dark_frac")),
+                    ice_clim_f = t(var.get.nc(node_grp, "ice_clim_f")),
+                    ice_dyn_f = t(var.get.nc(node_grp, "ice_dyn_f")),
+                    partial_f = t(var.get.nc(node_grp, "partial_f")),
+                    n_good_pix = t(var.get.nc(node_grp, "n_good_pix")),
+                    xovr_cal_q = t(var.get.nc(node_grp, "xovr_cal_q"))
   ))
   
 }
