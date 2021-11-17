@@ -135,11 +135,12 @@ apply_flags_node=function(data,dark_thresh){
 #' Run diagnostics on SWOT data
 #'
 #' @param input_dir string path to input directory
-#' @param string name of JSON reach file
-run_diagnostics <- function(input_dir, reaches_json) {
+#' @param reaches_json string name of JSON reach file
+#' @param tolerance float filter tolerance level
+#' @param index integer used to index reaches_json file
+run_diagnostics <- function(input_dir, reaches_json, tolerance, index) {
   
   # Retrieve input data
-  index <- strtoi(Sys.getenv("AWS_BATCH_JOB_ARRAY_INDEX")) + 1
   reach_files <- get_reach_files(reaches_json, input_dir, index)
   data <- get_data(reach_files)
   
