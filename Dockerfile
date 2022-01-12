@@ -29,8 +29,7 @@ RUN apt update && apt -y install \
 		r-base-dev \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& /usr/bin/Rscript -e "install.packages('RNetCDF', dependencies=TRUE, repos='http://cran.rstudio.com/')" \
-    && /usr/bin/Rscript -e "install.packages('rjson', dependencies=TRUE, repos='http://cran.rstudio.com/')" \
-	&& /usr/bin/Rscript -e "install.packages('bit', dependencies=TRUE, repos='http://cran.rstudio.com/')"
+    && /usr/bin/Rscript -e "install.packages('rjson', dependencies=TRUE, repos='http://cran.rstudio.com/')"
 
 # STAGE 2 set up I/O directories, copy geobamdata installer and R script
 FROM stage1 as stage2
