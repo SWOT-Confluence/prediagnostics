@@ -1,4 +1,5 @@
 library(RNetCDF)
+library(bit64)
 
 #' Writes processed data to appropriate NetCDF file
 #'
@@ -56,7 +57,7 @@ record_results <- function(output_dir, reach_id, reach_flags, node_flags,
   nc_out = create.nc(nc_file, format="netcdf4")
   
   # Global attr
-  att.put.nc(nc_out, "NC_GLOBAL", "reach_id", "NC_INT64", reach_id)
+  att.put.nc(nc_out, "NC_GLOBAL", "reach_id", "NC_INT64", as.integer64(reach_id))
   
   # Dims and coord vars
   dim.def.nc(nc_out, "num_nodes", dim(node_flags$ice_clim_f)[1])
