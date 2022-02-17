@@ -102,6 +102,7 @@ apply_flags_reach=function(data,dark_thresh, node_thresh, obs_thresh){
   Hobs=data$wse
   Sobs=data$slope
   
+  # Find anywhere where 1 and replace with NA
   Wobs[master_flag]=NA
   Hobs[master_flag]=NA
   Sobs[master_flag]=NA
@@ -160,10 +161,9 @@ apply_flags_node=function(data,dark_thresh){
 #'
 #' @param input_dir string path to input directory
 #' @param reaches_json string name of JSON reach file
-#' @param tolerance float filter tolerance level
 #' @param index integer used to index reaches_json file
 #' @param output_dir string path to output directory
-run_diagnostics <- function(input_dir, reaches_json, tolerance, index, output_dir) {
+run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
   
   # Retrieve input data
   reach_files <- get_reach_files(reaches_json, input_dir, index)
@@ -176,18 +176,21 @@ run_diagnostics <- function(input_dir, reaches_json, tolerance, index, output_di
   if (length(width) != 0 || length(wse) != 0 || length(slope) != 0) {
     
     # Apply flags to reach and node data
-    reach_diag_data <- apply_flags_reach(data$reach_list, 1, 1, 1)
+    reach_diag_data <- apply_flags_reach(data$reach_list, 
+                                         GLOBAL_PARAMS$reach_dark, 
+                                         GLOBAL_PARAMS$reach_node,
+                                         GLOBAL_PARAMS$reach_obs)
     reach_list <- reach_diag_data$data
     reach_flags <- reach_diag_data$flags
-    node_diag_data <- apply_flags_node(data$node_list, 1)
+    node_diag_data <- apply_flags_node(data$node_list, GLOBAL_PARAMS$node_dark)
     node_list <- node_diag_data$data
     node_flags <- node_diag_data$flags
     
     # Apply sesame street filter to reach and node data
-    reach_ses_diags <- sesame_street(reach_list, 1.5)
+    reach_ses_diags <- sesame_street(reach_list, GLOBAL_PARAMS$Tukey_number)
     reach_list <- reach_ses_diags$data
     reach_outliers <- reach_ses_diags$flags
-    node_ses_diags <- sesame_street(node_list, 1.5)
+    node_ses_diags <- sesame_street(node_list, GLOBAL_PARAMS$Tukey_number)
     node_list <- node_ses_diags$data
     node_outliers <- node_ses_diags$flags
     
