@@ -208,6 +208,34 @@ low_slope=function(data, sword_slope, min_slope, level){
   
 }
 
+#' Apply filter to d_x_area to mask out values where there is not any width or
+#' wse data present.
+#'
+#' @param data dataframe
+#'
+#' @return dataframe
+filter_dxa=function(data, level){
+  
+  # Filter width an wse NAs
+  data$d_x_area[is.na(data$width)] <- NA
+  data$d_x_area[is.na(data$wse)] <- NA
+  
+  # Save flags to indicate overwritten data
+  length = dim(data$width)
+  if (level == "reach") {
+    d_x_area_flags <- rep(0, times=c(length))
+    d_x_area_flags[is.na(data$width)] <- 1
+    d_x_area_flags[is.na(data$wse)] <- 1
+  } else {
+    d_x_area_flags <- array(0, dim=length)
+    d_x_area_flags[is.na(data$width)] <- 1
+    d_x_area_flags[is.na(data$wse)] <- 1
+  }
+  
+  return(list(data=data, flags=d_x_area_flags))
+  
+}
+
 #' Run diagnostics on SWOT data
 #'
 #' @param input_dir string path to input directory
@@ -258,10 +286,18 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
       node_slope_flags <- array(0, dim=dim(data$node_list$slope))
     }
     
+    # Filter d_x_area based on width and wse
+    reach_dxa_diags <- filter_dxa(reach_list, "reach")
+    reach_list <- reach_dxa_diags$data
+    reach_dxa_flags <- reach_dxa_diags$flags
+    node_dxa_diags <- filter_dxa(node_list, "node")
+    node_list <- node_dxa_diags$data
+    node_dxa_flags <- node_dxa_diags$flags
+    
     # Write output of diagnostics
     write_data(reach_list, node_list, reach_flags, node_flags, reach_outliers, 
-               node_outliers, reach_slope_flags, node_slope_flags, 
-               reach_files$swot, output_dir)
+               node_outliers, reach_slope_flags, node_slope_flags, reach_dxa_flags,
+               node_dxa_flags, reach_files$swot, output_dir)
     message(paste0(reach_files$reach_id, ": Node and reach files overwritten."))
   
     } else {
