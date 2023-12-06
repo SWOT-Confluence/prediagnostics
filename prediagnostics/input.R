@@ -14,7 +14,8 @@ library(rjson)
 get_reach_files <- function(reaches_json, input_dir, index) {
   json_data <- fromJSON(file=file.path(input_dir, reaches_json))[[index]]
   return(list(reach_id=json_data$reach_id, 
-              swot=file.path(input_dir, "swot", json_data$swot)))
+              swot=file.path(input_dir, "swot", json_data$swot),
+              sword=file.path(input_dir, "sword", json_data$sword)))
 }
 
 #' Get and store data from reach and node files
@@ -26,12 +27,25 @@ get_reach_files <- function(reaches_json, input_dir, index) {
 #' @return named list of node named list and reach named list
 get_data <- function(reach_files) {
   
+  # Retrieve SWOT data
   swot <- open.nc(reach_files$swot)
   reach_list <- get_reach_data(swot, reach_files$reach_id)
   node_list <- get_node_data(swot, reach_files$reach_id)
   close.nc(swot)
   
-  return(list(reach_list=reach_list, node_list=node_list))
+  # Retrieve SWORD data
+  sword <- open.nc(reach_files$sword)
+  r_grp = grp.inq.nc(sword, "reaches")$self
+  reach_ids = var.get.nc(r_grp, "reach_id")
+  sword_slope = var.get.nc(r_grp, "slope")
+  low_slope_flags = var.get.nc(r_grp, "low_slope_flag")
+  index = which(reach_ids == reach_files$reach_id)
+  low_slope_flag = low_slope_flags[index]
+  slope = sword_slope[index]/1000 # Convert m/km in SWORD to m/m for SWOT
+  close.nc(sword)
+  
+  return(list(reach_list=reach_list, node_list=node_list, sword_slope=slope,
+              low_slope_flag=low_slope_flag))
 }
 
 #' Retrieve node data from swot_file
@@ -45,14 +59,16 @@ get_node_data <- function(swot, reach_id) {
   node_grp = grp.inq.nc(swot, "node")$self
   return(list(reach_id = reach_id, 
                     node_id = t(var.get.nc(node_grp, "node_id")),
-                    slope = t(var.get.nc(node_grp, "slope2")),
+                    slope2 = t(var.get.nc(node_grp, "slope2")),
+                    slope = t(var.get.nc(node_grp, "slope")),
                     width = t(var.get.nc(node_grp, "width")), 
                     wse = t(var.get.nc(node_grp, "wse")), 
+                    d_x_area = t(var.get.nc(node_grp, "d_x_area")),
                     node_q = t(var.get.nc(node_grp, "node_q")),
                     dark_frac = t(var.get.nc(node_grp, "dark_frac")),
                     ice_clim_f = t(var.get.nc(node_grp, "ice_clim_f")),
                     ice_dyn_f = t(var.get.nc(node_grp, "ice_dyn_f")),
-                    partial_f = t(var.get.nc(node_grp, "partial_f")),
+                    # partial_f = t(var.get.nc(node_grp, "partial_f")),
                     n_good_pix = t(var.get.nc(node_grp, "n_good_pix")),
                     xovr_cal_q = t(var.get.nc(node_grp, "xovr_cal_q"))
   ))
@@ -71,7 +87,9 @@ get_reach_data <- function(swot, reach_id) {
   return(list(reach_id = reach_id, 
                     width = var.get.nc(reach_grp, "width"), 
                     wse = var.get.nc(reach_grp, "wse"), 
-                    slope = var.get.nc(reach_grp, "slope2"),
+                    d_x_area = var.get.nc(reach_grp, "d_x_area"), 
+                    slope2 = var.get.nc(reach_grp, "slope2"),
+                    slope = var.get.nc(reach_grp, "slope"),
                     reach_q = var.get.nc(reach_grp, "reach_q"),
                     dark_frac = var.get.nc(reach_grp, "dark_frac"),
                     ice_clim_f = var.get.nc(reach_grp, "ice_clim_f"),

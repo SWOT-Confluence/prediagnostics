@@ -8,6 +8,7 @@ sesame_street=function(data,Tukey_number){
   Wobs=data$width
   Hobs=data$wse
   Sobs=data$slope
+  S2obs=data$slope2
   
   #flag and remove all data that are > n IQRs away from the upper and lower quartile (Tukey method)
   
@@ -27,6 +28,10 @@ sesame_street=function(data,Tukey_number){
   S_upper_outlier=S_IQR[2] + (Tukey_number* (S_IQR[2]-S_IQR[1]))
   S_lower_outlier=S_IQR[1] - (Tukey_number* (S_IQR[2]-S_IQR[1]))
   
+  S2_IQR = quantile(S2obs, probs=c(0.25,0.75), na.rm=TRUE)
+  S2_upper_outlier=S2_IQR[2] + (Tukey_number* (S2_IQR[2]-S2_IQR[1]))
+  S2_lower_outlier=S2_IQR[1] - (Tukey_number* (S2_IQR[2]-S2_IQR[1]))
+  
   # Track flags as numeric 1/0 vector or matrix
   width_flags = Wobs>  W_upper_outlier | Wobs<  W_lower_outlier
   width_flags[is.na(width_flags)] = FALSE
@@ -43,22 +48,31 @@ sesame_street=function(data,Tukey_number){
   slope_flags[slope_flags == FALSE] = 0
   slope_flags[slope_flags == TRUE] = 1
   
+  slope2_flags = S2obs>  S2_upper_outlier | S2obs<  S2_lower_outlier
+  slope2_flags[is.na(slope2_flags)] = FALSE
+  slope2_flags[slope2_flags == FALSE] = 0
+  slope2_flags[slope2_flags == TRUE] = 1
+  
   # Apply flags to data
   W_flagged=which(Wobs>  W_upper_outlier | Wobs<  W_lower_outlier )
   H_flagged=which(Hobs>  H_upper_outlier | Hobs<  H_lower_outlier )
   S_flagged=which(Sobs>  S_upper_outlier | Sobs<  S_lower_outlier )
+  S2_flagged=which(S2obs>  S2_upper_outlier | S2obs<  S2_lower_outlier )
   
   Wobs[W_flagged]=NA
   Hobs[H_flagged]=NA
   Sobs[S_flagged]=NA
+  S2obs[S2_flagged]=NA
   
   data$width=Wobs
   data$wse=Hobs
   data$slope=Sobs
+  data$slope2=S2obs
   
   return(list(data=data, flags=list(width_flags=width_flags,
                                     wse_flags=wse_flags, 
-                                    slope_flags=slope_flags)))
+                                    slope_flags=slope_flags,
+                                    slope2_flags=slope2_flags)))
   
 }
 
@@ -70,7 +84,7 @@ sesame_street=function(data,Tukey_number){
 #' @param obs_thresh 
 #'
 #' @return dataframe of reach data
-apply_flags_reach=function(data,dark_thresh, node_thresh, obs_thresh){
+apply_flags_reach=function(data, dark_thresh, node_thresh, obs_thresh){
   
   flag1=data$ice_clim_f
   flag2=data$ice_dyn_f
@@ -101,15 +115,18 @@ apply_flags_reach=function(data,dark_thresh, node_thresh, obs_thresh){
   Wobs=data$width
   Hobs=data$wse
   Sobs=data$slope
+  S2obs=data$slope2
   
   # Find anywhere where 1 and replace with NA
   Wobs[master_flag]=NA
   Hobs[master_flag]=NA
   Sobs[master_flag]=NA
+  S2obs[master_flag]=NA
   
   data$width=Wobs
   data$wse=Hobs
   data$slope=Sobs
+  data$slope2=S2obs
   
   return(list(data=data, flags=list(ice_clim_f=flag1, ice_dyn_f=flag2, 
                                     dark_frac=flag3, n_good_nod=flag4, 
@@ -143,17 +160,79 @@ apply_flags_node=function(data,dark_thresh){
   Wobs=data$width
   Hobs=data$wse
   Sobs=data$slope
+  S2obs=data$slope2
   
   Wobs[master_flag]=NA
   Hobs[master_flag]=NA
   Sobs[master_flag]=NA
+  S2obs[master_flag]=NA
   
   data$width=Wobs
   data$wse=Hobs
   data$slope=Sobs
+  data$slope2=S2obs
   
   return(list(data=data, flags=list(ice_clim_f=flag1, ice_dyn_f=flag2, 
                                     dark_frac=flag3)))
+  
+}
+
+#' Apply filter to filter out low slope
+#'
+#' @param data dataframe
+#' @param min_slope 
+#'
+#' @return dataframe
+low_slope=function(data, sword_slope, min_slope, level){
+  
+  # Determine if prior slope is larger than constant
+  if (sword_slope > min_slope) {
+    slope_value <- sword_slope
+  } else {
+    slope_value <- min_slope
+  }
+  
+  # Set slope and slope2
+  length = dim(data$slope)
+  if (level == "reach") {
+    data$slope <- rep(slope_value, times=c(length))
+    data$slope2 <- rep(slope_value, times=length)
+    slope_flags <- rep(1, times=length)
+  } else {
+    data$slope <- array(slope_value, dim=length)
+    data$slope2 <- array(slope_value, dim=length)
+    slope_flags <- array(1, dim=length)
+  }
+  
+  return(list(data=data, flags=slope_flags))
+  
+}
+
+#' Apply filter to d_x_area to mask out values where there is not any width or
+#' wse data present.
+#'
+#' @param data dataframe
+#'
+#' @return dataframe
+filter_dxa=function(data, level){
+  
+  # Filter width an wse NAs
+  data$d_x_area[is.na(data$width)] <- NA
+  data$d_x_area[is.na(data$wse)] <- NA
+  
+  # Save flags to indicate overwritten data
+  length = dim(data$width)
+  if (level == "reach") {
+    d_x_area_flags <- rep(0, times=c(length))
+    d_x_area_flags[is.na(data$width)] <- 1
+    d_x_area_flags[is.na(data$wse)] <- 1
+  } else {
+    d_x_area_flags <- array(0, dim=length)
+    d_x_area_flags[is.na(data$width)] <- 1
+    d_x_area_flags[is.na(data$wse)] <- 1
+  }
+  
+  return(list(data=data, flags=d_x_area_flags))
   
 }
 
@@ -194,9 +273,31 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
     node_list <- node_ses_diags$data
     node_outliers <- node_ses_diags$flags
     
+    # Apply low slope filter to reach and node data
+    if (data$low_slope_flag == 1) {
+      reach_low_slope_diags <- low_slope(reach_list, data$sword_slope, GLOBAL_PARAMS$slope_min, "reach")
+      reach_list <- reach_low_slope_diags$data
+      reach_slope_flags <- reach_low_slope_diags$flags
+      node_low_slope_diags <- low_slope(node_list, data$sword_slope, GLOBAL_PARAMS$slope_min, "node")
+      node_list <- node_low_slope_diags$data
+      node_slope_flags <- node_low_slope_diags$flags
+    } else {
+      reach_slope_flags <- rep(0, times=dim(data$reach_list$slope))
+      node_slope_flags <- array(0, dim=dim(data$node_list$slope))
+    }
+    
+    # Filter d_x_area based on width and wse
+    reach_dxa_diags <- filter_dxa(reach_list, "reach")
+    reach_list <- reach_dxa_diags$data
+    reach_dxa_flags <- reach_dxa_diags$flags
+    node_dxa_diags <- filter_dxa(node_list, "node")
+    node_list <- node_dxa_diags$data
+    node_dxa_flags <- node_dxa_diags$flags
+    
     # Write output of diagnostics
     write_data(reach_list, node_list, reach_flags, node_flags, reach_outliers, 
-               node_outliers, reach_files$swot, output_dir)
+               node_outliers, reach_slope_flags, node_slope_flags, reach_dxa_flags,
+               node_dxa_flags, reach_files$swot, output_dir)
     message(paste0(reach_files$reach_id, ": Node and reach files overwritten."))
   
     } else {

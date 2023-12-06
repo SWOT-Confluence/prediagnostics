@@ -3,5 +3,6 @@ GLOBAL_PARAMS = list (
   reach_dark = 0.5,
   reach_node = 0.5,
   reach_obs = 0.5,
-  node_dark = 0.5
+  node_dark = 0.5,
+  slope_min = 1.7e-5
 )
