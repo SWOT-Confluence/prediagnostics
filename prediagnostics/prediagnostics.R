@@ -82,55 +82,66 @@ sesame_street=function(data,Tukey_number){
 #' @param dark_thresh 
 #' @param node_thresh 
 #' @param obs_thresh 
+#' @param reachq_thresh
+#' @param xovr_thresh
 #'
 #' @return dataframe of reach data
-apply_flags_reach=function(data, dark_thresh, node_thresh, obs_thresh){
+apply_flags_reach=function(data, ice_thresh, dark_thresh, node_thresh, 
+                           obs_thresh, reachq_thresh, xovr_thresh){
   
   flag1=data$ice_clim_f
-  flag2=data$ice_dyn_f
+  # flag2=data$ice_dyn_f
   flag3=data$dark_frac
   flag4=data$n_good_nod
   flag5=data$obs_frac_n
+  flag6=data$reach_q
+  flag7=data$xovr_cal_q
+  
+  #make non binary flags binary
+  flag1 <- +(flag1 <= ice_thresh)
+  # flag2 <- +(flag2 <= ice_thresh)
+  flag3 <- +(flag3 < dark_thresh)
+  flag4 <- +(flag4 > node_thresh)
+  flag5 <- +(flag5 > obs_thresh)
+  flag6 <- +(flag6 <= reachq_thresh)
+  flag7 <- +(flag7 <= xovr_thresh)
   
   #na will mess it up later
   flag1[is.na(flag1)]=0
-  flag2[is.na(flag2)]=0
+  # flag2[is.na(flag2)]=0
   flag3[is.na(flag3)]=0
   flag4[is.na(flag4)]=0
   flag5[is.na(flag5)]=0
-  
-  #make non binary flags binary
-  flag3[flag3<dark_thresh]=0
-  flag3[flag3>dark_thresh]=1  
-  
-  flag4[flag4<node_thresh]=1
-  flag4[flag4>node_thresh]=0
- 
-  flag5[flag5<obs_thresh]=1
-  flag5[flag5>obs_thresh]=0
+  flag6[is.na(flag6)]=0
+  flag7[is.na(flag7)]=0
   
   #make a giant flag
-  master_flag=flag1*flag2*flag3*flag4*flag5
+  # master_flag=flag1*flag2*flag3*flag4*flag5*flag6*flag7
+  master_flag=flag1*flag3*flag4*flag5*flag6*flag7
   
   Wobs=data$width
   Hobs=data$wse
   Sobs=data$slope
   S2obs=data$slope2
   
-  # Find anywhere where 1 and replace with NA
-  Wobs[master_flag]=NA
-  Hobs[master_flag]=NA
-  Sobs[master_flag]=NA
-  S2obs[master_flag]=NA
+  # Find anywhere where 0 and replace with NA
+  Wobs[master_flag == 0]=NA
+  Hobs[master_flag == 0]=NA
+  Sobs[master_flag == 0]=NA
+  S2obs[master_flag == 0]=NA
   
   data$width=Wobs
   data$wse=Hobs
   data$slope=Sobs
   data$slope2=S2obs
   
-  return(list(data=data, flags=list(ice_clim_f=flag1, ice_dyn_f=flag2, 
-                                    dark_frac=flag3, n_good_nod=flag4, 
-                                    obs_frac_n=flag5)))
+  return(list(data=data, flags=list(ice_clim_f=+(!flag1), 
+                                    # ice_dyn_f=+(!flag2), 
+                                    dark_frac=+(!flag3), 
+                                    n_good_nod=+(!flag4), 
+                                    obs_frac_n=+(!flag5), 
+                                    reach_q=+(!flag6),
+                                    xovr_cal_q=+(!flag7))))
 }
 
 #' Identify and apply flags to reach-level data
@@ -139,41 +150,54 @@ apply_flags_reach=function(data, dark_thresh, node_thresh, obs_thresh){
 #' @param dark_thresh 
 #'
 #' @return dataframe of node-level data
-apply_flags_node=function(data,dark_thresh){
+apply_flags_node=function(data, ice_thresh, dark_thresh, nodeq_thresh, 
+                          xovr_thresh) {
   
-  flag1=data$ice_clim_f
-  flag2=data$ice_dyn_f
-  flag3=data$dark_frac
-
-  #na will mess it up later
-  flag1[is.na(flag1)]=0
-  flag2[is.na(flag2)]=0
-  flag3[is.na(flag3)]=0
+  flag1 = data$ice_clim_f
+  # flag2 = data$ice_dyn_f
+  flag3 = data$dark_frac
+  flag4 = data$node_q
+  flag5 = data$xovr_cal_q
   
   #make non binary flags binary
-  flag3[flag3<dark_thresh]=0
-  flag3[flag3>dark_thresh]=1  
+  flag1 = +(flag1 <= ice_thresh)
+  # flag2 = +(flag2 <= ice_thresh)
+  flag3 = +(flag3 < dark_thresh)
+  flag4 = +(flag4 <= nodeq_thresh) 
+  flag5 = +(flag5 <= xovr_thresh)
+  
+  #na will mess it up later
+  flag1[is.na(flag1)] = 0
+  # flag2[is.na(flag2)] = 0
+  flag3[is.na(flag3)] = 0
+  flag4[is.na(flag4)] = 0
+  flag5[is.na(flag5)] = 0
   
   #make a giant flag
-  master_flag=flag1*flag2*flag3
+  # master_flag = flag1*flag2*flag3*flag4*flag5
+  master_flag = flag1*flag3*flag4*flag5
   
-  Wobs=data$width
-  Hobs=data$wse
-  Sobs=data$slope
-  S2obs=data$slope2
+  Wobs = data$width
+  Hobs = data$wse
+  Sobs = data$slope
+  S2obs = data$slope2
   
-  Wobs[master_flag]=NA
-  Hobs[master_flag]=NA
-  Sobs[master_flag]=NA
-  S2obs[master_flag]=NA
+  # Find anywhere where 0 and replace with NA
+  Wobs[master_flag == 0] = NA
+  Hobs[master_flag == 0] = NA
+  Sobs[master_flag == 0] = NA
+  S2obs[master_flag == 0] = NA
   
-  data$width=Wobs
-  data$wse=Hobs
-  data$slope=Sobs
-  data$slope2=S2obs
+  data$width = Wobs
+  data$wse = Hobs
+  data$slope = Sobs
+  data$slope2 = S2obs
   
-  return(list(data=data, flags=list(ice_clim_f=flag1, ice_dyn_f=flag2, 
-                                    dark_frac=flag3)))
+  return(list(data = data, flags = list(ice_clim_f = +(!flag1), 
+                                        # ice_dyn_f = +(!flag2),
+                                        dark_frac = +(!flag3),
+                                        node_q = +(!flag4),
+                                        xovr_cal_q = +(!flag5))))
   
 }
 
@@ -255,13 +279,20 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
   if (length(width) != 0 || length(wse) != 0 || length(slope) != 0) {
     
     # Apply flags to reach and node data
-    reach_diag_data <- apply_flags_reach(data$reach_list, 
+    reach_diag_data <- apply_flags_reach(data$reach_list,
+                                         GLOBAL_PARAMS$reach_ice,
                                          GLOBAL_PARAMS$reach_dark, 
                                          GLOBAL_PARAMS$reach_node,
-                                         GLOBAL_PARAMS$reach_obs)
+                                         GLOBAL_PARAMS$reach_obs,
+                                         GLOBAL_PARAMS$reach_q,
+                                         GLOBAL_PARAMS$reach_xovr_cal_q)
     reach_list <- reach_diag_data$data
     reach_flags <- reach_diag_data$flags
-    node_diag_data <- apply_flags_node(data$node_list, GLOBAL_PARAMS$node_dark)
+    node_diag_data <- apply_flags_node(data$node_list, 
+                                       GLOBAL_PARAMS$node_ice,
+                                       GLOBAL_PARAMS$node_dark,
+                                       GLOBAL_PARAMS$node_q, 
+                                       GLOBAL_PARAMS$node_xovr_cal_q)
     node_list <- node_diag_data$data
     node_flags <- node_diag_data$flags
     
