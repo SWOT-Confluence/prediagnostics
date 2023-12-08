@@ -128,13 +128,6 @@ write_reach_flags <- function(r_grp, reach_flags, reach_outliers,
   att.put.nc(r_grp, "dark_frac", "_FillValue", "NC_INT", fill)
   var.put.nc(r_grp, "dark_frac", reach_flags$dark_frac)
   
-  var.def.nc(r_grp, "n_good_nod", "NC_INT", "time_steps")
-  att.put.nc(r_grp, "n_good_nod", "long_name", "NC_STRING", "number of nodes in the reach that have a valid WSE")
-  att.put.nc(r_grp, "n_good_nod", "flag_values", "NC_STRING", "0 1")
-  att.put.nc(r_grp, "n_good_nod", "flag_meanings", "NC_STRING", "not_overwritten overwritten")
-  att.put.nc(r_grp, "n_good_nod", "_FillValue", "NC_INT", fill)
-  var.put.nc(r_grp, "n_good_nod", reach_flags$n_good_nod)
-  
   var.def.nc(r_grp, "obs_frac_n", "NC_INT", "time_steps")
   att.put.nc(r_grp, "obs_frac_n", "long_name", "NC_STRING", "fraction of nodes that have a valid WSE")
   att.put.nc(r_grp, "obs_frac_n", "flag_values", "NC_STRING", "0 1")

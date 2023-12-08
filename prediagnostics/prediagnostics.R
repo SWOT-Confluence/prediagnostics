@@ -86,13 +86,12 @@ sesame_street=function(data,Tukey_number){
 #' @param xovr_thresh
 #'
 #' @return dataframe of reach data
-apply_flags_reach=function(data, ice_thresh, dark_thresh, node_thresh, 
-                           obs_thresh, reachq_thresh, xovr_thresh){
+apply_flags_reach=function(data, ice_thresh, dark_thresh, obs_thresh, 
+                           reachq_thresh, xovr_thresh){
   
   flag1=data$ice_clim_f
   # flag2=data$ice_dyn_f
   flag3=data$dark_frac
-  flag4=data$n_good_nod
   flag5=data$obs_frac_n
   flag6=data$reach_q
   flag7=data$xovr_cal_q
@@ -100,9 +99,8 @@ apply_flags_reach=function(data, ice_thresh, dark_thresh, node_thresh,
   #make non binary flags binary
   flag1 <- +(flag1 <= ice_thresh)
   # flag2 <- +(flag2 <= ice_thresh)
-  flag3 <- +(flag3 < dark_thresh)
-  flag4 <- +(flag4 > node_thresh)
-  flag5 <- +(flag5 > obs_thresh)
+  flag3 <- +(flag3 <= dark_thresh)
+  flag5 <- +(flag5 >= obs_thresh)
   flag6 <- +(flag6 <= reachq_thresh)
   flag7 <- +(flag7 <= xovr_thresh)
   
@@ -110,14 +108,13 @@ apply_flags_reach=function(data, ice_thresh, dark_thresh, node_thresh,
   flag1[is.na(flag1)]=0
   # flag2[is.na(flag2)]=0
   flag3[is.na(flag3)]=0
-  flag4[is.na(flag4)]=0
   flag5[is.na(flag5)]=0
   flag6[is.na(flag6)]=0
   flag7[is.na(flag7)]=0
   
   #make a giant flag
-  # master_flag=flag1*flag2*flag3*flag4*flag5*flag6*flag7
-  master_flag=flag1*flag3*flag4*flag5*flag6*flag7
+  # master_flag=flag1*flag2*flag3*flag5*flag6*flag7
+  master_flag=flag1*flag3*flag5*flag6*flag7
   
   Wobs=data$width
   Hobs=data$wse
@@ -138,7 +135,6 @@ apply_flags_reach=function(data, ice_thresh, dark_thresh, node_thresh,
   return(list(data=data, flags=list(ice_clim_f=+(!flag1), 
                                     # ice_dyn_f=+(!flag2), 
                                     dark_frac=+(!flag3), 
-                                    n_good_nod=+(!flag4), 
                                     obs_frac_n=+(!flag5), 
                                     reach_q=+(!flag6),
                                     xovr_cal_q=+(!flag7))))
@@ -162,7 +158,7 @@ apply_flags_node=function(data, ice_thresh, dark_thresh, nodeq_thresh,
   #make non binary flags binary
   flag1 = +(flag1 <= ice_thresh)
   # flag2 = +(flag2 <= ice_thresh)
-  flag3 = +(flag3 < dark_thresh)
+  flag3 = +(flag3 <= dark_thresh)
   flag4 = +(flag4 <= nodeq_thresh) 
   flag5 = +(flag5 <= xovr_thresh)
   
@@ -282,7 +278,6 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
     reach_diag_data <- apply_flags_reach(data$reach_list,
                                          GLOBAL_PARAMS$reach_ice,
                                          GLOBAL_PARAMS$reach_dark, 
-                                         GLOBAL_PARAMS$reach_node,
                                          GLOBAL_PARAMS$reach_obs,
                                          GLOBAL_PARAMS$reach_q,
                                          GLOBAL_PARAMS$reach_xovr_cal_q)

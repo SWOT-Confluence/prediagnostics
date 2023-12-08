@@ -2,7 +2,6 @@ GLOBAL_PARAMS = list (
   Tukey_number = 1.5,
   reach_ice = 1,
   reach_dark = 0.5,
-  reach_node = 0.5,
   reach_obs = 0.5,
   reach_q = 1,
   reach_xovr_cal_q = 1,
