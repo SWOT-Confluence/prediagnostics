@@ -12,7 +12,7 @@ library(rjson)
 #'
 #' @return named list of reach files associate with reach identifier
 get_reach_files <- function(reaches_json, input_dir, index) {
-  json_data <- fromJSON(file=file.path(input_dir, reaches_json))[[index]]
+  json_data <- fromJSON(file=reaches_json)[[index]]
   return(list(reach_id=json_data$reach_id, 
               swot=file.path(input_dir, "swot", json_data$swot),
               sword=file.path(input_dir, "sword", json_data$sword)))
