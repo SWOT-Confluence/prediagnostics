@@ -11,7 +11,10 @@ output_dir <- file.path("/mnt", "data", "output")
 
 # Command line arguments
 args = commandArgs(trailingOnly=TRUE)
-reaches_json = ifelse(identical(args, character(0)), "reaches.json", args[1])
+# reaches_json = ifelse(identical(args, character(0)), "reaches.json", args[1])
+
+all_reach_jsons = Sys.glob(file.path(input_dir, 'reaches*'))
+reaches_json = all_reach_jsons[strtoi(args[1])]
 
 # Run Diagnostics
 index <- strtoi(Sys.getenv("AWS_BATCH_JOB_ARRAY_INDEX")) + 1
