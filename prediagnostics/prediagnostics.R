@@ -272,7 +272,7 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
   width <- data$reach_list$width[!is.na(data$reach_list$width)]
   wse <- data$reach_list$wse[!is.na(data$reach_list$wse)]
   slope <- data$reach_list$slope[!is.na(data$reach_list$slope)]
-  if (length(width) != 0 || length(wse) != 0 || length(slope) != 0) {
+  if (length(width) > 1 || length(wse) > 1 || length(slope) > 1) {
     
     # Apply flags to reach and node data
     reach_diag_data <- apply_flags_reach(data$reach_list,
