@@ -88,10 +88,6 @@ record_results <- function(output_dir, reach_id, reach_flags, node_flags,
   var.def.nc(nc_out, "time_steps", "NC_INT", "time_steps")
   att.put.nc(nc_out, "time_steps", "units", "NC_STRING", "number of observations")
   var.put.nc(nc_out, "time_steps", c(1:dim(node_flags$ice_flag)[2]))
-  print("time steps")
-  print(dim(node_flags$ice_flag)[2])
-  print("num_nodes")
-  print(dim(node_flags$ice_flag)[1])
   # Groups and variables
   fill = -999
   r_grp = grp.def.nc(nc_out, "reach")
@@ -114,8 +110,7 @@ record_results <- function(output_dir, reach_id, reach_flags, node_flags,
 #' @param fill integer missing value
 write_reach_flags <- function(r_grp, reach_flags, reach_outliers, 
                               reach_slope_flags, reach_dxa_flags, fill) {
-  print("reach flags")
-  print(names(reach_flags))
+
   var.def.nc(r_grp, "ice_clim_f", "NC_INT", "time_steps")
   att.put.nc(r_grp, "ice_clim_f", "long_name", "NC_STRING", "climatological ice cover flag")
   att.put.nc(r_grp, "ice_clim_f", "flag_values", "NC_STRING", "0 1")
@@ -236,8 +231,7 @@ write_reach_flags <- function(r_grp, reach_flags, reach_outliers,
 write_node_flags <- function(n_grp, node_flags, node_outliers, node_slope_flags,
                              node_dxa_flags, fill) {
 
-  print(print(dim(node_flags$ice_flag)))
-  print(node_flags$ice_flag)
+
   var.def.nc(n_grp, "ice_clim_f", "NC_INT", c("num_nodes","time_steps"))
   att.put.nc(n_grp, "ice_clim_f", "long_name", "NC_STRING", "climatological ice cover flag")
   att.put.nc(n_grp, "ice_clim_f", "flag_values", "NC_STRING", "0 1")
@@ -245,7 +239,6 @@ write_node_flags <- function(n_grp, node_flags, node_outliers, node_slope_flags,
   att.put.nc(n_grp, "ice_clim_f", "_FillValue", "NC_INT", fill)
   var.put.nc(n_grp, "ice_clim_f", node_flags$ice_flag)
 
-  print(dim(node_flags$ice_flag))
 
   var.def.nc(n_grp, "dark_frac", "NC_INT", c("num_nodes","time_steps"))
   att.put.nc(n_grp, "dark_frac", "long_name", "NC_STRING", "Fraction of reach area_total covered by dark water")
