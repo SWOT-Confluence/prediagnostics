@@ -19,12 +19,12 @@ write_data <- function(reach_list, node_list, reach_flags, node_flags,
                        node_slope_flags, reach_dxa_flags, node_dxa_flags, 
                        swot_file, output_dir) {
   
-  # Update SWOT files
-  update_swot(swot_file, reach_list, node_list)
+  # Update SWOT files and get time stamps
+  time_strings =  update_swot(swot_file, reach_list, node_list)
     
   
   # Record results of prediagnostics
-  record_results(output_dir, reach_list$reach_id, reach_flags, node_flags, 
+  record_results(time_strings,output_dir, reach_list$reach_id, reach_flags, node_flags, 
                  reach_outliers, node_outliers, reach_slope_flags, 
                  node_slope_flags, reach_dxa_flags, node_dxa_flags)
   
@@ -53,7 +53,9 @@ update_swot <- function(swot_file, reach_list, node_list) {
   var.put.nc(node_grp, "width", t(node_list$width))
   var.put.nc(node_grp, "wse", t(node_list$wse))
   var.put.nc(node_grp, "d_x_area", t(node_list$d_x_area))
+  time_strings = var.get.nc(reach_grp, "time_str")
   close.nc(swot)
+  return(time_strings)
 }
 
 #' Records results of prediagnostic flagging operations.
@@ -66,7 +68,7 @@ update_swot <- function(swot_file, reach_list, node_list) {
 #' @param node_slope_flags array of node-level low slope flags
 #' @param reach_dxa_flags Indicates where d_x_area has been overwritten with NA
 #' @param node_dxa_flags Indicates where d_x_area has been overwritten with NA 
-record_results <- function(output_dir, reach_id, reach_flags, node_flags,
+record_results <- function(time_strings, output_dir, reach_id, reach_flags, node_flags,
                            reach_outliers, node_outliers, reach_slope_flags,
                            node_slope_flags, reach_dxa_flags, node_dxa_flags) {
   
@@ -76,20 +78,27 @@ record_results <- function(output_dir, reach_id, reach_flags, node_flags,
    
   
   # Global attr
-  print("here is reach_id")
-  print(reach_id)
   att.put.nc(nc_out, "NC_GLOBAL", "reach_id", "NC_INT64", as.integer(reach_id))
-  
+
+  # Add global params attributes
+  for (param_name in names(GLOBAL_PARAMS)) {
+    value <- GLOBAL_PARAMS[[param_name]]
+    att.put.nc(nc_out, "NC_GLOBAL", param_name, "NC_DOUBLE", value)
+    print('added')
+    print(param_name)
+  }
+
   # Dims and coord vars
   dim.def.nc(nc_out, "num_nodes", dim(node_flags$ice_flag)[1])
   var.def.nc(nc_out, "num_nodes", "NC_INT", "num_nodes")
+
   att.put.nc(nc_out, "num_nodes", "units", "NC_STRING", "number of nodes")
   var.put.nc(nc_out, "num_nodes", c(1:dim(node_flags$ice_flag)[1]))
   
   dim.def.nc(nc_out, "time_steps", dim(node_flags$ice_flag)[2])
-  var.def.nc(nc_out, "time_steps", "NC_INT", "time_steps")
+  var.def.nc(nc_out, "time_steps", "NC_STRING", "time_steps")
   att.put.nc(nc_out, "time_steps", "units", "NC_STRING", "number of observations")
-  var.put.nc(nc_out, "time_steps", c(1:dim(node_flags$ice_flag)[2]))
+  var.put.nc(nc_out, "time_steps", time_strings)
   # Groups and variables
   fill = -999
   r_grp = grp.def.nc(nc_out, "reach")
