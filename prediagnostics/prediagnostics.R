@@ -87,8 +87,8 @@ sesame_street=function(data,Tukey_number){
 #'
 #' @return dataframe of reach data
 apply_flags_reach=function(data, ice_max, dark_max, xover_cal_q_max, 
-                           prior_width_min,bitwise_max,cross_track_dist_max_km,
-                           reach_length_min_km,slope_r_u_max,wse_r_u_max ){
+                           prior_width_min,bitwise_max,cross_track_dist_min_m,
+                           reach_length_min_m,slope_r_u_max,wse_r_u_max ){
   #read in flags
   ice_flag=data$ice_clim_f
   dark_flag=data$dark_frac
@@ -109,8 +109,8 @@ apply_flags_reach=function(data, ice_max, dark_max, xover_cal_q_max,
     xover_flag = +(xover_flag <= xover_cal_q_max)
     prior_width_flag = +(prior_width >= prior_width_min)
     bitwise_flag = +(bitwise_flag <= bitwise_max)
-    xtrack_flag = +(xtrack_flag <= cross_track_dist_max_km)
-    reach_length_flag = +(reach_length_flag >= reach_length_min_km)
+    xtrack_flag = +(xtrack_flag >= cross_track_dist_min_m)
+    reach_length_flag = +(reach_length_flag >= reach_length_min_m)
         wse_u_flag = +(wse_u_flag <= wse_r_u_max)
     slope_u_flag = +(slope_u_flag <= slope_r_u_max)
      
@@ -213,7 +213,7 @@ for (flag_name in names(flags)) {
 #'
 #' @return dataframe of node-level data
 apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max, 
-                           prior_width_min,bitwise_max,cross_track_dist_max_km, 
+                           prior_width_min,bitwise_max,cross_track_dist_min_m, 
                           slope_r_u_max,wse_r_u_max ) {
   
   #read in flags
@@ -235,8 +235,8 @@ apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max,
     xover_flag = +(xover_flag <= xover_cal_q_max)
     prior_width_flag = +(prior_width >= prior_width_min)
     bitwise_flag = +(bitwise_flag <= bitwise_max)
-    xtrack_flag = +(xtrack_flag <= cross_track_dist_max_km)
-    # reach_length_flag = +(reach_length_flag >= reach_length_min_km)
+    xtrack_flag = +(xtrack_flag >= cross_track_dist_min_m)
+    # reach_length_flag = +(reach_length_flag >= reach_length_min_m)
     wse_u_flag = +(wse_u_flag <= wse_r_u_max)
     slope_u_flag = +(slope_u_flag <= slope_r_u_max)
      
@@ -385,8 +385,8 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
                                          xover_cal_q_max=GLOBAL_PARAMS$xover_cal_q_max, 
                                          prior_width_min=GLOBAL_PARAMS$prior_width_min, 
                                          bitwise_max=GLOBAL_PARAMS$bitwise_max, 
-                                         cross_track_dist_max_km=GLOBAL_PARAMS$cross_track_dist_max_km, 
-                                         reach_length_min_km=GLOBAL_PARAMS$reach_length_min_km,
+                                         cross_track_dist_min_m=GLOBAL_PARAMS$cross_track_dist_min_m, 
+                                         reach_length_min_m=GLOBAL_PARAMS$reach_length_min_m,
                                          wse_r_u_max=GLOBAL_PARAMS$wse_r_u_max,
                                          slope_r_u_max=GLOBAL_PARAMS$slope_r_u_max)
     reach_list <- reach_diag_data$data
@@ -397,7 +397,7 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
                                          xover_cal_q_max=GLOBAL_PARAMS$xover_cal_q_max, 
                                          prior_width_min=GLOBAL_PARAMS$prior_width_min, 
                                          bitwise_max=GLOBAL_PARAMS$bitwise_max, 
-                                         cross_track_dist_max_km=GLOBAL_PARAMS$cross_track_dist_max_km,
+                                         cross_track_dist_min_m=GLOBAL_PARAMS$cross_track_dist_min_m,
                                          wse_r_u_max=GLOBAL_PARAMS$wse_r_u_max,
                                          slope_r_u_max=GLOBAL_PARAMS$slope_r_u_max)
     node_list <- node_diag_data$data
