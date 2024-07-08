@@ -1,16 +1,29 @@
 GLOBAL_PARAMS = list (
+
   Tukey_number = 1.5,
+
   ice_max = 0,
+
   dark_max = 0.1,
+
   xover_cal_q_max = 1,
+
   slope_min = 1.7e-5,
+
   prior_width_min = 80 ,
+
   bitwise_max= 15,
-  cross_track_dist_max_km= 15,
-  reach_length_min_km=7,
+
+  cross_track_dist_max_km= 15000,
+
+  reach_length_min_km=7000,
+
   wse_r_u_max = 0.5,
-  slope_r_u_max=10e-5  
+
+  slope_r_u_max=10e-5 
+
 )
+ 
 
 # wse_r_u < 0.5 m and slope_r_u < 10 cm/km
 

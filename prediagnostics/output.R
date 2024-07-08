@@ -76,7 +76,9 @@ record_results <- function(output_dir, reach_id, reach_flags, node_flags,
    
   
   # Global attr
-  att.put.nc(nc_out, "NC_GLOBAL", "reach_id", "NC_INT64", reach_id)
+  print("here is reach_id")
+  print(reach_id)
+  att.put.nc(nc_out, "NC_GLOBAL", "reach_id", "NC_INT64", as.integer(reach_id))
   
   # Dims and coord vars
   dim.def.nc(nc_out, "num_nodes", dim(node_flags$ice_flag)[1])
