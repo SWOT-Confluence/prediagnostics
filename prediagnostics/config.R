@@ -14,9 +14,9 @@ GLOBAL_PARAMS = list (
 
   bitwise_max= 15,
 
-  cross_track_dist_max_km= 15000,
+  cross_track_dist_min_m= 15000,
 
-  reach_length_min_km=7000,
+  reach_length_min_m=7000,
 
   wse_r_u_max = 0.5,
 
