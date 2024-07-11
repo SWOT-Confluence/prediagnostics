@@ -6,8 +6,8 @@ source("/app/prediagnostics/output.R")
 start = Sys.time()
 
 # Directories
-input_dir = file.path("/mnt", "data", "input")
-output_dir = file.path("/mnt", "data", "output")
+# input_dir = file.path("/mnt", "data", "input")
+# output_dir = file.path("/mnt", "data", "output")
 
 # Command line arguments
 args = commandArgs(trailingOnly=TRUE)
@@ -32,7 +32,7 @@ if (length(args)>=2){
 }
 
 # Run Diagnostics
-run_diagnostics(input_dir, reaches_json, index, output_dir)
+output=run_diagnostics(input_dir, reaches_json, index, output_dir)
 
 end = Sys.time()
 print(paste0("Execution time: ", end - start))

@@ -87,8 +87,8 @@ sesame_street=function(data,Tukey_number){
 #'
 #' @return dataframe of reach data
 apply_flags_reach=function(data, ice_max, dark_max, xover_cal_q_max, 
-                           prior_width_min,bitwise_max,cross_track_dist_max_km,
-                           reach_length_min_km,slope_r_u_max,wse_r_u_max ){
+                           prior_width_min,target_bit,cross_track_dist_min_m,
+                           reach_length_min_m,slope_r_u_max,wse_r_u_max ){
   #read in flags
   ice_flag=data$ice_clim_f
   dark_flag=data$dark_frac
@@ -100,6 +100,11 @@ apply_flags_reach=function(data, ice_max, dark_max, xover_cal_q_max,
   wse_u_flag=data$wse_r_u
   slope_u_flag=data$slope_r_u
     
+  #convert bitwise integers to bit arrays
+ bitwiser=function(bitwise_in, target_bit_in){
+    bitpass=  (+(bitwAnd(target_bit_in, 2^seq(0,28))>0)) - (+(bitwAnd(bitwise_in, 2^seq(0,28))>0))
+    if(any(bitpass<0)){return(0)}else{return(1)}
+        }
 
      
   #make non binary flags binary
@@ -108,12 +113,15 @@ apply_flags_reach=function(data, ice_max, dark_max, xover_cal_q_max,
     dark_flag = +(dark_flag <= dark_max)
     xover_flag = +(xover_flag <= xover_cal_q_max)
     prior_width_flag = +(prior_width >= prior_width_min)
-    bitwise_flag = +(bitwise_flag <= bitwise_max)
-    xtrack_flag = +(xtrack_flag <= cross_track_dist_max_km)
-    reach_length_flag = +(reach_length_flag >= reach_length_min_km)
-        wse_u_flag = +(wse_u_flag <= wse_r_u_max)
+    #make a matrix of bitwise filtered data
+    bitwise_flag = do.call(cbind,lapply(bitwise_flag,bitwiser,target_bit_in= target_bit))
+    xtrack_flag = +(xtrack_flag >= cross_track_dist_min_m)
+    reach_length_flag = +(reach_length_flag >= reach_length_min_m)
+    wse_u_flag = +(wse_u_flag <= wse_r_u_max)
     slope_u_flag = +(slope_u_flag <= slope_r_u_max)
-     
+
+ 
+
  
   #na will mess it up later
   ice_flag[is.na(ice_flag)]=0
@@ -135,6 +143,9 @@ apply_flags_reach=function(data, ice_max, dark_max, xover_cal_q_max,
     reach_length_flag=matrix(reach_length_flag,nrow=1,ncol=length(reach_length_flag))
     wse_u_flag=matrix(wse_u_flag,nrow=1,ncol=length(wse_u_flag))
     slope_u_flag=matrix(slope_u_flag,nrow=1,ncol=length(slope_u_flag))
+    
+    
+  
      # print(ice_flag)
      # print(dark_flag)
      # print(xover_flag)
@@ -148,6 +159,10 @@ apply_flags_reach=function(data, ice_max, dark_max, xover_cal_q_max,
 
   
 master_flag=ice_flag*dark_flag*xover_flag*prior_width_flag*bitwise_flag*reach_length_flag*xtrack_flag*wse_u_flag*slope_u_flag
+   
+    ntot=sum(master_flag)
+    
+ 
     
     
   Wobs=data$width
@@ -168,6 +183,14 @@ master_flag=ice_flag*dark_flag*xover_flag*prior_width_flag*bitwise_flag*reach_le
   data$slope2=S2obs
 
     #flags take an oppoiste meaning in broader env, so flip 0s and 1s
+    
+    ################################
+    ####################################
+    
+    ###### flips from 1 = KEPT to 1= elmimnated ##########
+    
+    #################################
+    ########################
   return(list(data=data, flags=list(ice_flag=+(!ice_flag), 
                                     prior_width_flag=+(!prior_width_flag), 
                                     dark_flag=+(!dark_flag), 
@@ -175,8 +198,10 @@ master_flag=ice_flag*dark_flag*xover_flag*prior_width_flag*bitwise_flag*reach_le
                                     xtrack_flag=+(!xtrack_flag), 
                                     bitwise_flag=+(!bitwise_flag),
                                     xover_flag=+(!xover_flag),
-                                  slope_u_flag=+(!slope_u_flag),
-                                    wse_u_flag =+(!wse_u_flag))     
+                                    slope_u_flag=+(!slope_u_flag),
+                                    wse_u_flag =+(!wse_u_flag),
+                                   master_flag = +(!master_flag),
+                                   ntot= ntot)   
              ))
 }
 
@@ -187,7 +212,7 @@ master_flag=ice_flag*dark_flag*xover_flag*prior_width_flag*bitwise_flag*reach_le
 #'
 #' @return dataframe of node-level data
 apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max, 
-                           prior_width_min,bitwise_max,cross_track_dist_max_km, 
+                           prior_width_min,target_bit,cross_track_dist_min_m, 
                           slope_r_u_max,wse_r_u_max ) {
   
   #read in flags
@@ -200,6 +225,16 @@ apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max,
   xtrack_flag=data$cross_track_dist
   wse_u_flag=data$wse_r_u
   slope_u_flag=data$slope_r_u
+    
+ 
+    
+   
+#convert bitwise integers to bit arrays
+ bitwiser_node=function(bitwise_in, target_bit_in){
+    bitpass=  +(bitwAnd(target_bit_in, 2^seq(0,28))>0) - (+(bitwAnd(bitwise_in, 2^seq(0,28))>0))
+     if(all(is.na(bitpass))){return(0)}
+    if(any(bitpass<0)){return(0)}else{return(1)}
+        }
 
      
   #make non binary flags binary
@@ -208,12 +243,22 @@ apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max,
     dark_flag = +(dark_flag <= dark_max)
     xover_flag = +(xover_flag <= xover_cal_q_max)
     prior_width_flag = +(prior_width >= prior_width_min)
-    bitwise_flag = +(bitwise_flag <= bitwise_max)
-    xtrack_flag = +(xtrack_flag <= cross_track_dist_max_km)
+    #in node mode, we need to apply bitwiser to all elements of the matrix
+    bitwise_flag_node=matrix(nrow=nrow(bitwise_flag),ncol=ncol(bitwise_flag))
+    for (i in 1:nrow(bitwise_flag)){
+        for(j in 1:ncol(bitwise_flag)){
+            this_bit= bitwiser_node(bitwise_flag[i,j],target_bit)
+             bitwise_flag_node[i,j]=this_bit
+            }
+        }
+
+    bitwise_flag = bitwise_flag_node
+    xtrack_flag = +(xtrack_flag >= cross_track_dist_min_m)
     # reach_length_flag = +(reach_length_flag >= reach_length_min_km)
     wse_u_flag = +(wse_u_flag <= wse_r_u_max)
     slope_u_flag = +(slope_u_flag <= slope_r_u_max)
      
+    
  
   #na will mess it up later
   ice_flag[is.na(ice_flag)]=0
@@ -256,7 +301,15 @@ apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max,
   data$slope=Sobs
   data$slope2=S2obs
   
-
+    #flags take an oppoiste meaning in broader env, so flip 0s and 1s
+    
+    ################################
+    ####################################
+    
+    ###### flips from 1 = KEPT to 1= elmimnated ##########
+    
+    #################################
+    ########################
    
   return(list(data=data, flags=list(ice_flag=+(!ice_flag), 
                                     prior_width_flag=+(!prior_width_flag), 
@@ -320,12 +373,14 @@ filter_dxa=function(data, level){
   length = dim(data$width)
   if (level == "reach") {
     d_x_area_flags <- rep(0, times=c(length))
-    d_x_area_flags[is.na(data$width)] <- 1
-    d_x_area_flags[is.na(data$wse)] <- 1
+      #edit on 7/11/24 to turn this off
+    # d_x_area_flags[is.na(data$width)] <- 1
+    # d_x_area_flags[is.na(data$wse)] <- 1
   } else {
     d_x_area_flags <- array(0, dim=length)
-    d_x_area_flags[is.na(data$width)] <- 1
-    d_x_area_flags[is.na(data$wse)] <- 1
+        #edit on 7/11/24 to turn this off
+    # d_x_area_flags[is.na(data$width)] <- 1
+    # d_x_area_flags[is.na(data$wse)] <- 1
   }
   
   return(list(data=data, flags=d_x_area_flags))
@@ -339,9 +394,17 @@ filter_dxa=function(data, level){
 #' @param index integer used to index reaches_json file
 #' @param output_dir string path to output directory
 run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
+    
+    source("/nas/cee-water/cjgleason/colin/prediagnostics/prediagnostics/config.R")
+source("/nas/cee-water/cjgleason/colin/prediagnostics/prediagnostics/input.R")
+source("/nas/cee-water/cjgleason/colin/prediagnostics/prediagnostics/prediagnostics.R")
+source("/nas/cee-water/cjgleason/colin/prediagnostics/prediagnostics/output.R")
+    library(dplyr)
   
   # Retrieve input data
   reach_files <- get_reach_files(reaches_json, input_dir, index)
+    
+  
   data <- get_data(reach_files)
   
   # Check if data is valid
@@ -357,9 +420,9 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
                                          dark_max=GLOBAL_PARAMS$dark_max, 
                                          xover_cal_q_max=GLOBAL_PARAMS$xover_cal_q_max, 
                                          prior_width_min=GLOBAL_PARAMS$prior_width_min, 
-                                         bitwise_max=GLOBAL_PARAMS$bitwise_max, 
-                                         cross_track_dist_max_km=GLOBAL_PARAMS$cross_track_dist_max_km, 
-                                         reach_length_min_km=GLOBAL_PARAMS$reach_length_min_km,
+                                         target_bit=GLOBAL_PARAMS$target_bit, 
+                                         cross_track_dist_min_m=GLOBAL_PARAMS$cross_track_dist_min_m, 
+                                         reach_length_min_m=GLOBAL_PARAMS$reach_length_min_m,
                                          wse_r_u_max=GLOBAL_PARAMS$wse_r_u_max,
                                          slope_r_u_max=GLOBAL_PARAMS$slope_r_u_max)
     reach_list <- reach_diag_data$data
@@ -369,12 +432,33 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
                                          dark_max=GLOBAL_PARAMS$dark_max, 
                                          xover_cal_q_max=GLOBAL_PARAMS$xover_cal_q_max, 
                                          prior_width_min=GLOBAL_PARAMS$prior_width_min, 
-                                         bitwise_max=GLOBAL_PARAMS$bitwise_max, 
-                                         cross_track_dist_max_km=GLOBAL_PARAMS$cross_track_dist_max_km,
+                                         target_bit=GLOBAL_PARAMS$target_bit, 
+                                         cross_track_dist_min_m=GLOBAL_PARAMS$cross_track_dist_min_m,
                                          wse_r_u_max=GLOBAL_PARAMS$wse_r_u_max,
                                          slope_r_u_max=GLOBAL_PARAMS$slope_r_u_max)
     node_list <- node_diag_data$data
     node_flags <- node_diag_data$flags
+
+#       ## debugging toggle-------------
+   
+#       outmat=data.frame(
+#           'ice'=sum(reach_flags$ice_flag)/length(reach_flags$ice_flag),
+#           'p_width'=sum(reach_flags$prior_width_flag)/length(reach_flags$ice_flag),
+#           'dark'=sum(reach_flags$dark_flag)/length(reach_flags$ice_flag),
+#           'p_length'=sum(reach_flags$reach_length_flag)/length(reach_flags$ice_flag),
+#           'xtrack'=sum(reach_flags$xtrack_flag)/length(reach_flags$ice_flag),
+#           'bitwise'=sum(reach_flags$bitwise_flag)/length(reach_flags$ice_flag),
+#           'xover'=sum(reach_flags$xover_flag)/length(reach_flags$ice_flag),
+#           'slope_u'=sum(reach_flags$slope_u_flag)/length(reach_flags$ice_flag),
+#           'wse_u'=sum(reach_flags$wse_u_flag)/length(reach_flags$ice_flag),
+#           'master'=sum(reach_flags$master_flag)/length(reach_flags$ice_flag),
+#           'ntot'=reach_flags$ntot,
+#           'reach_id'=reach_files$reach_id)
+                    
+
+#       return( outmat)
+      
+#       ###end debugging toggle---------------
       
 
     

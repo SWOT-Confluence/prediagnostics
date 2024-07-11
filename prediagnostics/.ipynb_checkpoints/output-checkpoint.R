@@ -20,11 +20,11 @@ write_data <- function(reach_list, node_list, reach_flags, node_flags,
                        swot_file, output_dir) {
   
   # Update SWOT files
-  update_swot(swot_file, reach_list, node_list)
+  # update_swot(swot_file, reach_list, node_list)
     
   
   # Record results of prediagnostics
-  record_results(output_dir, reach_list$reach_id, reach_flags, node_flags, 
+record_results(output_dir, reach_list$reach_id, reach_flags, node_flags, 
                  reach_outliers, node_outliers, reach_slope_flags, 
                  node_slope_flags, reach_dxa_flags, node_dxa_flags)
   
@@ -77,17 +77,18 @@ record_results <- function(output_dir, reach_id, reach_flags, node_flags,
   
   # Global attr
   att.put.nc(nc_out, "NC_GLOBAL", "reach_id", "NC_INT64", reach_id)
-  
+   # print(dim(node_flags$ice_flag)[2])
+
   # Dims and coord vars
-  dim.def.nc(nc_out, "num_nodes", dim(node_flags$ice_clim_f)[1])
+  dim.def.nc(nc_out, "num_nodes", dim(node_flags$ice_flag)[1])
   var.def.nc(nc_out, "num_nodes", "NC_INT", "num_nodes")
   att.put.nc(nc_out, "num_nodes", "units", "NC_STRING", "number of nodes")
-  var.put.nc(nc_out, "num_nodes", c(1:dim(node_flags$ice_clim_f)[1]))
+  var.put.nc(nc_out, "num_nodes", c(1:dim(node_flags$ice_flag)[1]))
   
-  dim.def.nc(nc_out, "time_steps", dim(node_flags$ice_clim_f)[2])
+  dim.def.nc(nc_out, "time_steps", dim(node_flags$ice_flag)[2])
   var.def.nc(nc_out, "time_steps", "NC_INT", "time_steps")
   att.put.nc(nc_out, "time_steps", "units", "NC_STRING", "number of observations")
-  var.put.nc(nc_out, "time_steps", c(1:dim(node_flags$ice_clim_f)[2]))
+  var.put.nc(nc_out, "time_steps", c(1:dim(node_flags$ice_flag)[2]))
   
   # Groups and variables
   fill = -999
@@ -112,6 +113,7 @@ record_results <- function(output_dir, reach_id, reach_flags, node_flags,
 write_reach_flags <- function(r_grp, reach_flags, reach_outliers, 
                               reach_slope_flags, reach_dxa_flags, fill) {
   
+    # print( reach_flags$ice_flag)
   var.def.nc(r_grp, "ice_clim_f", "NC_INT", "time_steps")
   att.put.nc(r_grp, "ice_clim_f", "long_name", "NC_STRING", "climatological ice cover flag")
   att.put.nc(r_grp, "ice_clim_f", "flag_values", "NC_STRING", "0 1")
