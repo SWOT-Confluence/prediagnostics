@@ -23,6 +23,7 @@ RUN echo "America/New_York" | tee /etc/timezone \
 
 # STAGE 1 - R and R packages
 FROM stage0 as stage1
+RUN apt-get update
 RUN apt -y install \
 		software-properties-common \
 		dirmngr \
@@ -33,7 +34,8 @@ RUN apt -y install \
 		r-base \
 		r-base-dev \
 	&& /usr/bin/Rscript -e "install.packages('RNetCDF', dependencies=TRUE, repos='http://cran.rstudio.com/')" \
-    && /usr/bin/Rscript -e "install.packages('rjson', dependencies=TRUE, repos='http://cran.rstudio.com/')"
+    && /usr/bin/Rscript -e "install.packages('rjson', dependencies=TRUE, repos='http://cran.rstudio.com/')"\
+	&& /usr/bin/Rscript -e "install.packages('dplyr', dependencies=TRUE, repos='http://cran.rstudio.com/')"
 
 # STAGE 2 set up I/O directories, copy geobamdata installer and R script
 FROM stage1 as stage2

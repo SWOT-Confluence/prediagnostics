@@ -31,6 +31,8 @@ get_data <- function(reach_files) {
   swot <- open.nc(reach_files$swot)
   reach_list <- get_reach_data(swot, reach_files$reach_id)
   node_list <- get_node_data(swot, reach_files$reach_id)
+  r_grp = grp.inq.nc(swot, "reach")$self
+  time_str = var.get.nc(r_grp, "time_str")
   close.nc(swot)
   
   # Retrieve SWORD data
@@ -45,7 +47,7 @@ get_data <- function(reach_files) {
   close.nc(sword)
   
   return(list(reach_list=reach_list, node_list=node_list, sword_slope=slope,
-              low_slope_flag=low_slope_flag))
+              low_slope_flag=low_slope_flag, time_str=time_str))
 }
 
 #' Retrieve node data from swot_file
@@ -92,7 +94,7 @@ get_reach_data <- function(swot, reach_id) {
   
   reach_grp = grp.inq.nc(swot, "reach")$self
 
-    
+  
   return(list(reach_id = reach_id, 
                     width = var.get.nc(reach_grp, "width"), 
                     wse = var.get.nc(reach_grp, "wse"), 

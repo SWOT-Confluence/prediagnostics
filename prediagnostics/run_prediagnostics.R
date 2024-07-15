@@ -6,8 +6,8 @@ source("/app/prediagnostics/output.R")
 start = Sys.time()
 
 # Directories
-# input_dir = file.path("/mnt", "data", "input")
-# output_dir = file.path("/mnt", "data", "output")
+input_dir = file.path("/mnt", "data", "input")
+output_dir = file.path("/mnt", "data", "output")
 
 # Command line arguments
 args = commandArgs(trailingOnly=TRUE)

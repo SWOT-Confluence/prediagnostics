@@ -154,15 +154,42 @@ apply_flags_reach=function(data, ice_max, dark_max, xover_cal_q_max,
      # print(xtrack_flag)
      # print(reach_length_flag)
 
-#we now have binary flags for 1 = KEEP, 0 = DROP
-#this is an 'or' flag, so we multiply
+  #we now have binary flags for 1 = KEEP, 0 = DROP
+  #this is an 'or' flag, so we multiply
+  # Define your flags
+  flags <- list(
+    ice = ice_flag,
+    dark = dark_flag,
+    xover = xover_flag,
+    prior_width = prior_width_flag,
+    bitwise = bitwise_flag,
+    reach_length = reach_length_flag,
+    xtrack = xtrack_flag,
+    wse_u = wse_u_flag,
+    slope_u = slope_u_flag
+  )
 
   
-master_flag=ice_flag*dark_flag*xover_flag*prior_width_flag*bitwise_flag*reach_length_flag*xtrack_flag*wse_u_flag*slope_u_flag
+# master_flag=ice_flag*dark_flag*xover_flag*prior_width_flag*bitwise_flag*reach_length_flag*xtrack_flag*wse_u_flag*slope_u_flag
    
-    ntot=sum(master_flag)
+#     ntot=sum(master_flag)
     
- 
+ # Iterate over flags
+  master_flag <- NULL  # Initialize master_flag
+
+  for (flag_name in names(flags)) {
+    flag_value <- flags[[flag_name]]
+    
+    
+    if (is.null(master_flag)) {
+      master_flag <- flag_value
+    } else {
+      master_flag <- master_flag * flag_value
+    }
+    
+    cat("master_flag after", flag_name, ":", master_flag, "\n\n")
+  }
+  ntot=sum(master_flag)
     
     
   Wobs=data$width
@@ -395,10 +422,6 @@ filter_dxa=function(data, level){
 #' @param output_dir string path to output directory
 run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
     
-    source("/nas/cee-water/cjgleason/colin/prediagnostics/prediagnostics/config.R")
-source("/nas/cee-water/cjgleason/colin/prediagnostics/prediagnostics/input.R")
-source("/nas/cee-water/cjgleason/colin/prediagnostics/prediagnostics/prediagnostics.R")
-source("/nas/cee-water/cjgleason/colin/prediagnostics/prediagnostics/output.R")
     library(dplyr)
   
   # Retrieve input data
@@ -497,7 +520,7 @@ source("/nas/cee-water/cjgleason/colin/prediagnostics/prediagnostics/output.R")
 #output of diagnostics
     write_data(reach_list, node_list, reach_flags, node_flags, reach_outliers, 
                node_outliers, reach_slope_flags, node_slope_flags, reach_dxa_flags,
-               node_dxa_flags, reach_files$swot, output_dir)
+               node_dxa_flags, reach_files$swot, output_dir, GLOBAL_PARAMS, data)
     message(paste0(reach_files$reach_id, ": Node and reach files overwritten."))
   
     } else {
