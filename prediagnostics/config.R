@@ -1,16 +1,18 @@
-# Dec 2 2024 v 0002 params
+# Dec 4 2024 v 0002 params
 GLOBAL_PARAMS = list (
      prior_width_min_m = 80 ,
-     prior_slope_min = 1.7e-5,
+     prior_slope_min = 3.4e-5,
      reach_length_min_m=7000,
      cross_track_dist_min_m= 10000,
      cross_track_dist_max_m= 60000,
      ice_max = 0,
-     target_bit= 507510784, #FUNCTIONALLY EQUIVALENT TO _q<=2
+     target_bit_reach= 507510784, #FUNCTIONALLY EQUIVALENT TO _q<=2
+     target_bit_node= 507514368 , #adds flags 9,10, and 11
      dark_max = 0.4,
      obs_frac_min= 0.5,
      xover_cal_q_max = 1,
-     Tukey_number = 1.5
+     Tukey_number = 1.5,
+     n_node_pix_min =10
      # slope_r_u_max=10e-5 ## deprecated in v002
      # wse_r_u_max = 0.5 ## deprecated in v002
 )

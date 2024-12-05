@@ -87,7 +87,7 @@ sesame_street=function(data,Tukey_number){
 #'
 #' @return dataframe of reach data
 apply_flags_reach=function(data, ice_max, dark_max, xover_cal_q_max, 
-                           prior_width_min,target_bit,cross_track_dist_min_m,
+                           prior_width_min,target_bit_reach,cross_track_dist_min_m,
                            cross_track_dist_max_m,reach_length_min_m,
                            obs_frac_min){ 
     #deprecated inputs ,slope_r_u_max,wse_r_u_max  v0002
@@ -150,7 +150,7 @@ apply_flags_reach=function(data, ice_max, dark_max, xover_cal_q_max,
     xover_flag = +(xover_flag <= xover_cal_q_max)
     prior_width_flag = +(prior_width >= prior_width_min)
     #make a matrix of bitwise filtered data
-    bitwise_flag = do.call(cbind,lapply(bitwise_flag,bitwiser,target_bit_in= target_bit))
+    bitwise_flag = do.call(cbind,lapply(bitwise_flag,bitwiser,target_bit_in= target_bit_reach))
     #get the xtrack distance and filter for both min and max, add, and return anything >0,
     #i.e. any place either flag is tripped
     xtrack_flag_min = +(xtrack_flag >= cross_track_dist_min_m)
@@ -287,8 +287,8 @@ apply_flags_reach=function(data, ice_max, dark_max, xover_cal_q_max,
 #'
 #' @return dataframe of node-level data
 apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max, 
-                           prior_width_min,target_bit,cross_track_dist_min_m,
-                          cross_track_dist_max_m
+                           prior_width_min,target_bit_node,cross_track_dist_min_m,
+                          cross_track_dist_max_m, n_node_pix_min
                          ) {
   
     #dprectaed inputs v0002   slope_r_u_max,wse_r_u_max
@@ -301,6 +301,7 @@ apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max,
   bitwise_flag=data$bitwise
   # reach_length_flag=data$reach_length
   xtrack_flag=data$cross_track_dist
+  n_good_pix= data$n_good_pix 
     
     #deprecated v0002
   # wse_u_flag=data$wse_r_u
@@ -351,11 +352,11 @@ apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max,
     prior_width_flag = +(prior_width >= prior_width_min)
     #in node mode, we need to apply bitwiser to all elements of the matrix
     bitwise_flag_node=matrix(nrow=nrow(bitwise_flag),ncol=ncol(bitwise_flag))
-    
+    good_pix_flag= +(n_good_pix <= n_node_pix_min)
     
     for (i in 1:nrow(bitwise_flag)){
         for(j in 1:ncol(bitwise_flag)){
-            this_bit= bitwiser_node(bitwise_flag[i,j],target_bit)
+            this_bit= bitwiser_node(bitwise_flag[i,j],target_bit_node)
              bitwise_flag_node[i,j]=this_bit
             }
         }
@@ -382,6 +383,7 @@ apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max,
   bitwise_flag[is.na(bitwise_flag)]=0
   xtrack_flag[is.na(xtrack_flag)]=0
   bitwise_flag[is.na(bitwise_flag)]=0
+  good_pix_flag[is.na(good_pix_flag)]=0
     
   #deprecated v0002
   # slope_u_flag[is.na(slope_u_flag)]=0     
@@ -390,7 +392,7 @@ apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max,
 #we now have binary flags for 1 = KEEP, 0 = DROP
 #this is an 'or' flag, so we multiply
 
-  master_flag=ice_flag*dark_flag*xover_flag*prior_width_flag*bitwise_flag*xtrack_flag
+  master_flag=ice_flag*dark_flag*xover_flag*prior_width_flag*bitwise_flag*xtrack_flag*good_pix_flag
     
     #deprecated v0002
     #*wse_u_flag*slope_u_flag
@@ -428,43 +430,15 @@ apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max,
                                     dark_flag=+(!dark_flag), 
                                     xtrack_flag=+(!xtrack_flag), 
                                     bitwise_flag=+(!bitwise_flag),
-                                    xover_flag=+(!xover_flag))
+                                    xover_flag=+(!xover_flag),
+                                    good_pix_flag=+(!good_pix_flag))
                                     # slope_u_flag=+(!slope_u_flag),
                                     # wse_u_flag =+(!wse_u_flag))
              ))
   
 }
 
-#' Apply filter to filter out low slope
-#'
-#' @param data dataframe
-#' @param min_slope 
-#'
-#' @return dataframe
-low_slope=function(data, sword_slope, min_slope, level){
-  
-  # Determine if prior slope is larger than constant
-  if (sword_slope > min_slope) {
-    slope_value <- sword_slope
-  } else {
-    slope_value <- min_slope
-  }
-  
-  # Set slope and slope2
-  length = dim(data$slope)
-  if (level == "reach") {
-    data$slope <- rep(slope_value, times=c(length))
-    data$slope2 <- rep(slope_value, times=length)
-    slope_flags <- rep(1, times=length)
-  } else {
-    data$slope <- array(slope_value, dim=length)
-    data$slope2 <- array(slope_value, dim=length)
-    slope_flags <- array(1, dim=length)
-  }
-  
-  return(list(data=data, flags=slope_flags))
-  
-}
+
 
 #' Apply filter to d_x_area to mask out values where there is not any width or
 #' wse data present.
@@ -525,7 +499,7 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
                                          dark_max=GLOBAL_PARAMS$dark_max, 
                                          xover_cal_q_max=GLOBAL_PARAMS$xover_cal_q_max, 
                                          prior_width_min=GLOBAL_PARAMS$prior_width_min, 
-                                         target_bit=GLOBAL_PARAMS$target_bit, 
+                                         target_bit_reach=GLOBAL_PARAMS$target_bit_reach, 
                                          cross_track_dist_min_m=GLOBAL_PARAMS$cross_track_dist_min_m, 
                                          cross_track_dist_max_m=GLOBAL_PARAMS$cross_track_dist_max_m,
                                          reach_length_min_m=GLOBAL_PARAMS$reach_length_min_m,
@@ -539,9 +513,10 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
                                          dark_max=GLOBAL_PARAMS$dark_max, 
                                          xover_cal_q_max=GLOBAL_PARAMS$xover_cal_q_max, 
                                          prior_width_min=GLOBAL_PARAMS$prior_width_min, 
-                                         target_bit=GLOBAL_PARAMS$target_bit, 
+                                         target_bit_node=GLOBAL_PARAMS$target_bit_node, 
                                          cross_track_dist_min_m=GLOBAL_PARAMS$cross_track_dist_min_m,
-                                         cross_track_dist_max_m=GLOBAL_PARAMS$cross_track_dist_max_m)
+                                         cross_track_dist_max_m=GLOBAL_PARAMS$cross_track_dist_max_m,
+                                         n_node_pix_min = GLOBAL_PARAMS$n_node_pix_min)
                                          # wse_r_u_max=GLOBAL_PARAMS$wse_r_u_max,
                                          # slope_r_u_max=GLOBAL_PARAMS$slope_r_u_max)
     node_list <- node_diag_data$data
@@ -558,6 +533,7 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
 #           'bitwise'=sum(reach_flags$bitwise_flag)/length(reach_flags$ice_flag),
 #           'xover'=sum(reach_flags$xover_flag)/length(reach_flags$ice_flag),
 #           'obs_frac'=sum(reach_flags$obs_frac_flag)/length(reach_flags$ice_flag),
+#            'n_good_pix_node'=sum(node_flags$good_pix_flag)/length(node_flags$ice_flag),
 #           # 'slope_u'=sum(reach_flags$slope_u_flag)/length(reach_flags$ice_flag),
 #           # 'wse_u'=sum(reach_flags$wse_u_flag)/length(reach_flags$ice_flag),
 #           'master'=sum(reach_flags$master_flag)/length(reach_flags$ice_flag),
@@ -565,9 +541,9 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
 #           'reach_id'=reach_files$reach_id)
                     
 
-#       return( outmat)
+#       # return( outmat)
       
-#       ###end debugging toggle---------------
+#        ##end debugging toggle---------------
       
 
     
@@ -579,19 +555,65 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
     node_list <- node_ses_diags$data
     node_outliers <- node_ses_diags$flags
     
+
+      #' Apply filter to filter out low slope
+#'
+#' @param data dataframe
+#' @param min_slope 
+#'
+#' @return dataframe
+low_slope=function(data, sword_slope, min_slope, level){
+  
+    #deprecated v0002 December 2024
+  # Determine if prior slope is larger than constant
+  # if (sword_slope > min_slope) {
+  #   slope_value <- sword_slope
+  # } else {
+  #   slope_value <- min_slope
+  # }
+ 
+  if (any(data$slope< min_slope,na.rm=TRUE)){
+      slope_value=sword_slope
+
+      # Set slope and slope2
+      length = dim(data$slope)
+   
+          if (level == "reach") {
+            data$slope <-  rep(slope_value, times=length)
+            data$slope2 <- rep(slope_value, times=length)
+            slope_flags <- rep(1, times=length)
+          } else {
+            data$slope <-  array(slope_value, dim=length)
+            data$slope2 <- array(slope_value, dim=length)
+            slope_flags <- array(1, dim=length)
+          }
+      
+      } else {
+         length = dim(data$slope)
+        if (level == "reach") {
+            slope_flags <- rep(0, times=length)
+            } else {
+            slope_flags <- array(0, dim=length)
+        }  
+      
+   }
+
+      return(list(data=data, flags=slope_flags))
+
+}
+
     # Apply low slope filter to reach and node data
-    if (data$low_slope_flag == 1) {
-      reach_low_slope_diags <- low_slope(reach_list, data$sword_slope, GLOBAL_PARAMS$slope_min, "reach")
+
+      reach_low_slope_diags <- low_slope(data=reach_list, sword_slope=data$sword_slope,
+                                         min_slope=GLOBAL_PARAMS$prior_slope_min, level="reach")
       reach_list <- reach_low_slope_diags$data
       reach_slope_flags <- reach_low_slope_diags$flags
-      node_low_slope_diags <- low_slope(node_list, data$sword_slope, GLOBAL_PARAMS$slope_min, "node")
+      
+      node_low_slope_diags <- low_slope(data=node_list, sword_slope=data$sword_slope,
+                                        min_slope=GLOBAL_PARAMS$prior_slope_min, level="node")
       node_list <- node_low_slope_diags$data
       node_slope_flags <- node_low_slope_diags$flags
-    } else {
-      reach_slope_flags <- rep(0, times=dim(data$reach_list$slope))
-      node_slope_flags <- array(0, dim=dim(data$node_list$slope))
-    }
-    
+
     # Filter d_x_area based on width and wse
     reach_dxa_diags <- filter_dxa(reach_list, "reach")
     reach_list <- reach_dxa_diags$data
@@ -602,6 +624,7 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
     
     # 
       
+
       
 #output of diagnostics
     write_data(reach_list, node_list, reach_flags, node_flags, reach_outliers, 
