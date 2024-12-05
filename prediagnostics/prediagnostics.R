@@ -135,7 +135,7 @@ apply_flags_reach=function(data, ice_max, dark_max, xover_cal_q_max,
     this_flags=which(this_vector == 1)
 
     bitfail= any(this_flags %in% target_flags)
-     #return 0 if it fails, which means that the 'fail' condition is set to true in line 130
+     #return 0 if it fails, which means that the 'fail' condition is set to true
     if(bitfail == TRUE){return(0)}else{return(1)}
         }
 
@@ -338,7 +338,7 @@ apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max,
     this_flags=which(this_vector == 1)
 
     bitfail= any(this_flags %in% target_flags)
-     #return 0 if it fails, which means that the 'fail' condition is set to true in line 130
+     #return 0 if it fails, which means that the 'fail' condition is set to true 
     if(bitfail == TRUE){return(0)}else{return(1)}
         }
         
