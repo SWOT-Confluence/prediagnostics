@@ -7,7 +7,7 @@ GLOBAL_PARAMS = list (
      cross_track_dist_max_m= 60000,
      ice_max = 0,
      target_bit_reach= 507510784, #FUNCTIONALLY EQUIVALENT TO _q<=2
-     target_bit_node= 507514368 , #adds flags 9,10, and 11
+     target_bit_node=  532680192 , #adds flags 9,10, 11, 23, and 24 to the reach
      dark_max = 0.4,
      obs_frac_min= 0.5,
      xover_cal_q_max = 1,
