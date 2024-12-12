@@ -181,6 +181,12 @@ write_reach_flags <- function(r_grp, reach_flags, reach_outliers,
   att.put.nc(r_grp, "reach_length_flag", "_FillValue", "NC_INT", fill)
   var.put.nc(r_grp, "reach_length_flag",as.vector(reach_flags$reach_length_flag))
     
+    #dummy variable for hotfix December 2024.---------
+    #Remove when module is repiped-------------------
+    reach_flags$wse_u_flag = reach_flags$reach_length_flag
+    reach_flags$wse_u_flag[reach_flags$wse_u_flag==0] = fill
+    reach_flags$wse_u_flag[reach_flags$wse_u_flag==1] = fill
+    
   var.def.nc(r_grp, "wse_r_u_flag", "NC_INT", "time_steps")
   att.put.nc(r_grp, "wse_r_u_flag", "long_name", "NC_STRING", "swot height uncertainty flag")
   att.put.nc(r_grp, "wse_r_u_flag", "flag_values", "NC_STRING", "0 1")
@@ -188,13 +194,20 @@ write_reach_flags <- function(r_grp, reach_flags, reach_outliers,
   att.put.nc(r_grp, "wse_r_u_flag", "_FillValue", "NC_INT", fill)
   var.put.nc(r_grp, "wse_r_u_flag",as.vector(reach_flags$wse_u_flag))
     
+    reach_flags$slope_u_flag = reach_flags$reach_length_flag
+    reach_flags$slope_u_flag[reach_flags$slope_u_flag==0] = fill
+    reach_flags$slope_u_flag[reach_flags$slope_u_flag==1] = fill
+    
   var.def.nc(r_grp, "slope_r_u_flag", "NC_INT", "time_steps")
   att.put.nc(r_grp, "slope_r_u_flag", "long_name", "NC_STRING", "swot slope uncertainty flag")
   att.put.nc(r_grp, "slope_r_u_flag", "flag_values", "NC_STRING", "0 1")
   att.put.nc(r_grp, "slope_r_u_flag", "flag_meanings", "NC_STRING", "not_overwritten overwritten")
   att.put.nc(r_grp, "slope_r_u_flag", "_FillValue", "NC_INT", fill)
   var.put.nc(r_grp, "slope_r_u_flag",as.vector(reach_flags$slope_u_flag))
-  
+      
+    #dummy variable for hotfix December 2024.---------
+    #End remove section when module is repiped-------------------
+    
   var.def.nc(r_grp, "width_outliers", "NC_INT", "time_steps")
   att.put.nc(r_grp, "width_outliers", "long_name", "NC_STRING", "Outliers detected in width observations.")
   att.put.nc(r_grp, "width_outliers", "flag_values", "NC_STRING", "0 1")

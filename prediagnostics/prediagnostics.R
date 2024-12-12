@@ -386,8 +386,8 @@ apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max,
   good_pix_flag[is.na(good_pix_flag)]=0
     
   #deprecated v0002
-  # slope_u_flag[is.na(slope_u_flag)]=0     
-  # wse_u_flag[is.na(wse_u_flag)]=0  
+  # slope_u_flag=good_pix_flag     ##dummy as of v2
+  # wse_u_flag=good_pix_flag  ##dummy as of v2
 
 #we now have binary flags for 1 = KEEP, 0 = DROP
 #this is an 'or' flag, so we multiply
@@ -432,8 +432,8 @@ apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max,
                                     bitwise_flag=+(!bitwise_flag),
                                     xover_flag=+(!xover_flag),
                                     good_pix_flag=+(!good_pix_flag))
-                                    # slope_u_flag=+(!slope_u_flag),
-                                    # wse_u_flag =+(!wse_u_flag))
+                                    # slope_u_flag=+(!slope_u_flag), ##dummy as of v2
+                                    # wse_u_flag =+(!wse_u_flag)) ##dummy as of v2
              ))
   
 }
