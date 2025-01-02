@@ -522,29 +522,7 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
     node_list <- node_diag_data$data
     node_flags <- node_diag_data$flags
 
-#       ## debugging toggle-------------
-   
-#       outmat=data.frame(
-#           'ice'=sum(reach_flags$ice_flag)/length(reach_flags$ice_flag),
-#           'p_width'=sum(reach_flags$prior_width_flag)/length(reach_flags$ice_flag),
-#           'dark'=sum(reach_flags$dark_flag)/length(reach_flags$ice_flag),
-#           'p_length'=sum(reach_flags$reach_length_flag)/length(reach_flags$ice_flag),
-#           'xtrack'=sum(reach_flags$xtrack_flag)/length(reach_flags$ice_flag),
-#           'bitwise'=sum(reach_flags$bitwise_flag)/length(reach_flags$ice_flag),
-#           'xover'=sum(reach_flags$xover_flag)/length(reach_flags$ice_flag),
-#           'obs_frac'=sum(reach_flags$obs_frac_flag)/length(reach_flags$ice_flag),
-#            'n_good_pix_node'=sum(node_flags$good_pix_flag)/length(node_flags$ice_flag),
-#           # 'slope_u'=sum(reach_flags$slope_u_flag)/length(reach_flags$ice_flag),
-#           # 'wse_u'=sum(reach_flags$wse_u_flag)/length(reach_flags$ice_flag),
-#           'master'=sum(reach_flags$master_flag)/length(reach_flags$ice_flag),
-#           'ntot'=reach_flags$ntot,
-#           'reach_id'=reach_files$reach_id)
-                    
 
-#       # return( outmat)
-      
-#        ##end debugging toggle---------------
-      
 
     
     # Apply sesame street filter to reach and node data
@@ -554,7 +532,8 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
     node_ses_diags <- sesame_street(node_list, GLOBAL_PARAMS$Tukey_number)
     node_list <- node_ses_diags$data
     node_outliers <- node_ses_diags$flags
-    
+      
+      
 
       #' Apply filter to filter out low slope
 #'
@@ -564,43 +543,61 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
 #' @return dataframe
 low_slope=function(data, sword_slope, min_slope, level){
   
-    #deprecated v0002 December 2024
-  # Determine if prior slope is larger than constant
-  # if (sword_slope > min_slope) {
-  #   slope_value <- sword_slope
-  # } else {
-  #   slope_value <- min_slope
-  # }
- 
-  if (any(data$slope< min_slope,na.rm=TRUE)){
-      slope_value=sword_slope
 
-      # Set slope and slope2
-      length = dim(data$slope)
+###MIXED SLOPE TOGGLE 1/2/25
+
+    #we want to use the sword slope, unless it is less than the slope minimum
+    #check sword against the slope min, and then assign whichever is higher to 
+    #swot data that are < the slope minimum.
+if (sword_slope > min_slope) {
+    slope_value <- sword_slope
+  } else {
+    slope_value <- min_slope
+}
+
+    #reset any slope less than the minimum slope value to the slope value
+    data$slope[data$slope< min_slope]= slope_value
+    data$slope2[data$slope2< min_slope]= slope_value
+    #return a '1' where we have masked to slope
+    #the +() syntax will binarize
+    slope_flags=+(data$slope< min_slope)
+    #we don't want the NA in the flags
+    slope_flags[is.na(slope_flags)]=0
+    # print(slope_flags)
+### mixed slope toggle end
    
-          if (level == "reach") {
-            data$slope <-  rep(slope_value, times=length)
-            data$slope2 <- rep(slope_value, times=length)
-            slope_flags <- rep(1, times=length)
-          } else {
-            data$slope <-  array(slope_value, dim=length)
-            data$slope2 <- array(slope_value, dim=length)
-            slope_flags <- array(1, dim=length)
-          }
+ 
+# ### FIXED SLOPE TOGGLE 1/2/25    
+#   if (any(data$slope< min_slope,na.rm=TRUE)){
+#       slope_value=sword_slope
+
+#       # Set slope and slope2
+#       length = dim(data$slope)
+   
+#           if (level == "reach") {
+#             data$slope <-  rep(slope_value, times=length)
+#             data$slope2 <- rep(slope_value, times=length)
+#             slope_flags <- rep(1, times=length)
+#           } else {
+#             data$slope <-  array(slope_value, dim=length)
+#             data$slope2 <- array(slope_value, dim=length)
+#             slope_flags <- array(1, dim=length)
+#           }
       
-      } else {
-         length = dim(data$slope)
-        if (level == "reach") {
-            slope_flags <- rep(0, times=length)
-            } else {
-            slope_flags <- array(0, dim=length)
-        }  
+#       } else {
+#          length = dim(data$slope)
+#         if (level == "reach") {
+#             slope_flags <- rep(0, times=length)
+#             } else {
+#             slope_flags <- array(0, dim=length)
+#         }  
       
-   }
+#    }
+    #### fixed slope toggle end
 
       return(list(data=data, flags=slope_flags))
 
-}
+ } #end low slope function
 
     # Apply low slope filter to reach and node data
 
@@ -622,7 +619,37 @@ low_slope=function(data, sword_slope, min_slope, level){
     node_list <- node_dxa_diags$data
     node_dxa_flags <- node_dxa_diags$flags
     
-    # 
+#            ## debugging toggle-------------
+   
+#       outmat=data.frame(
+#           'ice'=sum(reach_flags$ice_flag)/length(reach_flags$ice_flag),
+#           'p_width'=sum(reach_flags$prior_width_flag)/length(reach_flags$ice_flag),
+#           'dark'=sum(reach_flags$dark_flag)/length(reach_flags$ice_flag),
+#           'p_length'=sum(reach_flags$reach_length_flag)/length(reach_flags$ice_flag),
+#           'xtrack'=sum(reach_flags$xtrack_flag)/length(reach_flags$ice_flag),
+#           'bitwise'=sum(reach_flags$bitwise_flag)/length(reach_flags$ice_flag),
+#           'xover'=sum(reach_flags$xover_flag)/length(reach_flags$ice_flag),
+#           'obs_frac'=sum(reach_flags$obs_frac_flag)/length(reach_flags$ice_flag),
+#            'n_good_pix_node'=sum(node_flags$good_pix_flag)/length(node_flags$ice_flag),
+#           # 'slope_u'=sum(reach_flags$slope_u_flag)/length(reach_flags$ice_flag),
+#           # 'wse_u'=sum(reach_flags$wse_u_flag)/length(reach_flags$ice_flag),
+#           'master'=sum(reach_flags$master_flag)/length(reach_flags$ice_flag),
+#           'ntot'=reach_flags$ntot,
+#           'reach_id'=reach_files$reach_id)
+                    
+
+#     return( list(reach_flags=reach_flags, 
+#                  node_flags=node_flags, 
+#                  reach_outliers=reach_outliers, 
+#                  node_outliers=node_outliers,
+#                  reach_slope_flags=reach_slope_flags, 
+#                  node_slope_flags=node_slope_flags,
+#                  reach_dxa_flags=reach_dxa_flags,
+#                  node_dxa_flags=node_dxa_flags))
+      
+#        ##end debugging toggle---------------
+      
+    
       
 
       
