@@ -196,47 +196,20 @@ apply_flags_reach=function(data, ice_max, dark_max, xover_cal_q_max,
 
   #we now have binary flags for 1 = KEEP, 0 = DROP
   #this is an 'or' flag, so we multiply
-  # Define your flags
-  flags <- list(
-    ice = ice_flag,
-    dark = dark_flag,
-    xover = xover_flag,
-    prior_width = prior_width_flag,
-    bitwise = bitwise_flag,
-    reach_length = reach_length_flag,
-    xtrack = xtrack_flag,
-    obs_frac=obs_frac_flag
-
-  )
     
     #deprecated v0002
     # wse_u = wse_u_flag,
     # slope_u = slope_u_flag
 
   
-# master_flag=ice_flag*dark_flag*xover_flag*prior_width_flag*bitwise_flag*reach_length_flag*xtrack_flag*obs_frac_flag
+master_flag=ice_flag*dark_flag*xover_flag*prior_width_flag*bitwise_flag*reach_length_flag*xtrack_flag*obs_frac_flag
     
     #deprecated v0002
     #*wse_u_flag*slope_u_flag
    
-#     ntot=sum(master_flag)
+    ntot=sum(master_flag)
     
- #Iterate over flags
-  master_flag <- NULL  # Initialize master_flag
 
-  for (flag_name in names(flags)) {
-    flag_value <- flags[[flag_name]]
-    
-    
-    if (is.null(master_flag)) {
-      master_flag <- flag_value
-    } else {
-      master_flag <- master_flag * flag_value
-    }
-    
-    # cat("master_flag after", flag_name, ":", master_flag, "\n\n")
-  }
-  ntot=sum(master_flag)
     
     
   Wobs=data$width
@@ -382,7 +355,6 @@ apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max,
   prior_width_flag[is.na(prior_width_flag)]=0
   bitwise_flag[is.na(bitwise_flag)]=0
   xtrack_flag[is.na(xtrack_flag)]=0
-  bitwise_flag[is.na(bitwise_flag)]=0
   good_pix_flag[is.na(good_pix_flag)]=0
     
   #deprecated v0002
@@ -426,11 +398,11 @@ apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max,
     ########################
    
   return(list(data=data, flags=list(ice_flag=+(!ice_flag), 
-                                    prior_width_flag=+(!prior_width_flag), 
                                     dark_flag=+(!dark_flag), 
-                                    xtrack_flag=+(!xtrack_flag), 
-                                    bitwise_flag=+(!bitwise_flag),
-                                    xover_flag=+(!xover_flag),
+                                     xover_flag=+(!xover_flag),
+                                    prior_width_flag=+(!prior_width_flag), 
+                                     bitwise_flag=+(!bitwise_flag),
+                                    xtrack_flag=+(!xtrack_flag),                                    
                                     good_pix_flag=+(!good_pix_flag))
                                     # slope_u_flag=+(!slope_u_flag), ##dummy as of v2
                                     # wse_u_flag =+(!wse_u_flag)) ##dummy as of v2
@@ -438,6 +410,7 @@ apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max,
   
 }
 
+ 
 
 
 #' Apply filter to d_x_area to mask out values where there is not any width or
