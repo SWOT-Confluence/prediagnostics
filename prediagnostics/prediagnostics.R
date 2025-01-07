@@ -485,7 +485,7 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
     
   
   data <- get_data(reach_files)
-  
+
   # Check if data is valid
   width <- data$reach_list$width[!is.na(data$reach_list$width)]
   wse <- data$reach_list$wse[!is.na(data$reach_list$wse)]
@@ -561,8 +561,8 @@ if (sword_slope > min_slope) {
     #return a '1' where we have masked to slope
     #the +() syntax will binarize
     slope_flags=+(data$slope< min_slope)
-    #we don't want the NA in the flags
-    slope_flags[is.na(slope_flags)]=0
+
+    
     # print(slope_flags)
 ### mixed slope toggle end
    
