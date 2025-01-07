@@ -286,12 +286,12 @@ write_node_flags <- function(n_grp, node_flags, node_outliers, node_slope_flags,
   att.put.nc(n_grp, "x_trk_dist_flag", "_FillValue", "NC_INT", fill)
   var.put.nc(n_grp, "x_trk_dist_flag", node_flags$xtrack_flag)
 
-  var.def.nc(n_grp, "reach_q_b", "NC_INT", c("num_nodes","time_steps"))
-  att.put.nc(n_grp, "reach_q_b", "long_name", "NC_STRING", "summary quality indicator for the reach")
-  att.put.nc(n_grp, "reach_q_b", "flag_values", "NC_STRING", "0 1")
-  att.put.nc(n_grp, "reach_q_b", "flag_meanings", "NC_STRING", "not_overwritten overwritten")
-  att.put.nc(n_grp, "reach_q_b", "_FillValue", "NC_INT", fill)
-  var.put.nc(n_grp, "reach_q_b", node_flags$bitwise_flag)
+  var.def.nc(n_grp, "node_q_b", "NC_INT", c("num_nodes","time_steps"))
+  att.put.nc(n_grp, "node_q_b", "long_name", "NC_STRING", "summary quality indicator for the reach")
+  att.put.nc(n_grp, "node_q_b", "flag_values", "NC_STRING", "0 1")
+  att.put.nc(n_grp, "node_q_b", "flag_meanings", "NC_STRING", "not_overwritten overwritten")
+  att.put.nc(n_grp, "node_q_b", "_FillValue", "NC_INT", fill)
+  var.put.nc(n_grp, "node_q_b", node_flags$bitwise_flag)
 
   var.def.nc(n_grp, "xovr_cal_q", "NC_INT", c("num_nodes","time_steps"))
   att.put.nc(n_grp, "xovr_cal_q", "long_name", "NC_STRING", "quality of the cross-over calibration")
