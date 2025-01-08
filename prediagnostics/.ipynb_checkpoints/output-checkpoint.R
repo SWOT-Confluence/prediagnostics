@@ -19,6 +19,10 @@ write_data <- function(reach_list, node_list, reach_flags, node_flags,
                        node_slope_flags, reach_dxa_flags, node_dxa_flags, 
                        swot_file, output_dir, GLOBAL_PARAMS, data) {
   
+    # print('data passed to outlier writer')
+    # print(reach_outliers)
+    # print('reach flags')
+    # print(reach_flags)
   # Update SWOT files
   update_swot(swot_file, reach_list, node_list)
     
@@ -37,7 +41,12 @@ record_results(output_dir, reach_list$reach_id, reach_flags, node_flags,
 #' @param node_list named list of node-level data
 update_swot <- function(swot_file, reach_list, node_list) {
     
+# print('slope that is written to netcdf')
+    # print(reach_list$slope)
 
+
+ # bonk
+    
   swot <- open.nc(swot_file, write=TRUE)
   # Reach
   reach_grp = grp.inq.nc(swot, "reach")$self

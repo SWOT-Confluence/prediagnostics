@@ -52,6 +52,9 @@ sesame_street=function(data,Tukey_number){
   slope2_flags[is.na(slope2_flags)] = FALSE
   slope2_flags[slope2_flags == FALSE] = 0
   slope2_flags[slope2_flags == TRUE] = 1
+    
+#     print('inside sesame street')
+#     print(slope2_flags)
   
   # Apply flags to data
   W_flagged=which(Wobs>  W_upper_outlier | Wobs<  W_lower_outlier )
@@ -92,6 +95,7 @@ apply_flags_reach=function(data, ice_max, dark_max, xover_cal_q_max,
                            obs_frac_min){ 
     #deprecated inputs ,slope_r_u_max,wse_r_u_max  v0002
     
+        hydrochronna=which(is.na(data$width))
   #read in flags
   ice_flag=data$ice_clim_f
   dark_flag=data$dark_frac
@@ -211,23 +215,94 @@ master_flag=ice_flag*dark_flag*xover_flag*prior_width_flag*bitwise_flag*reach_le
     
 
     
-    
   Wobs=data$width
   Hobs=data$wse
   Sobs=data$slope
   S2obs=data$slope2
+    
+    # print('after flags defined')
+    # print(data)
+    
+    # print('slope on first read into the flags function')
+    # print(Sobs)
+    # print(Hobs)
+    # print(Sobs)
+    # print(S2obs)
+    # bonk
+    
+#     print('master flag')
+#     print(master_flag)
+    
+    
+    
+    # print('ice')
+    # print(ice_flag)
+    # print('dark')
+    # print(dark_flag)#=matrix(dark_flag,nrow=1,ncol=length(dark_flag))
+    # print('xover')
+    # print(xover_flag)#=matrix(xover_flag,nrow=1,ncol=length(xover_flag))
+    # print('p_width')
+    # print(prior_width_flag)#=matrix(prior_width_flag,nrow=1,ncol=length(prior_width_flag))
+    # print('bitwise')
+    # print(bitwise_flag)#=matrix(bitwise_flag,nrow=1,ncol=length(bitwise_flag))
+    # print('xtrack')
+    # print(xtrack_flag)#=matrix(xtrack_flag,nrow=1,ncol=length(xtrack_flag))
+    # print('prior length')
+    # print(reach_length_flag)#=matrix(reach_length_flag,nrow=1,ncol=length(reach_length_flag))
+    # print('obs frac')
+    # print(obs_frac_flag)#=matrix(obs_frac_flag,nrow=1,ncol=length(obs_frac_flag))
   
   # Find anywhere where 0 and replace with NA
   Wobs[master_flag == 0]=NA
   Hobs[master_flag == 0]=NA
   Sobs[master_flag == 0]=NA
   S2obs[master_flag == 0]=NA
+    
+#       print('width after flagging NA assignment')
+#     print(Wobs)
+    
+    
+    # print(Hobs)
+    # print(Sobs)
+    # print(S2obs)
+    # bonk
   
     #rewrite
   data$width=Wobs
   data$wse=Hobs
   data$slope=Sobs
   data$slope2=S2obs
+    
+
+    
+#     print('NAs we inhereted from hydrochron upstream of this module')
+#     print(hydrochronna)
+    
+#     print('slope NA in data object after filtering')
+#     naindex=which(is.na(data$slope))
+#     print(naindex)
+    
+#     print('flags ON')
+#     master_index=which(master_flag==0)
+#     print(master_index)
+    
+#     print('NAs unique to flags')
+#     uniquetoflags=(setdiff(master_index,hydrochronna))
+#     print(uniquetoflags)
+    
+#     print('does this filtered data object have an NA slope for every flag?')
+#     print(all(master_index %in% naindex))
+    
+#     print('are the total flags exactly the union of the hydrochron NAs and the flagged NAs?')
+#     totalexpected=union(hydrochronna,master_index)
+#     print(setequal(totalexpected,naindex))
+   
+    
+#     print('slope after reassigning filtered data to the data object passed to output')
+#     print(data$slope)
+    
+#     print('after recombining')
+#     print(data)
 
     #flags take an oppoiste meaning in broader env, so flip 0s and 1s
     
@@ -458,11 +533,24 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
     
   
   data <- get_data(reach_files)
+    
+    # print('slope on first read from /mnt')
+    # print(data$reach_list$slope)
+    # print(data$reach_list$wse)
+    # print(data$reach_list$slope)
+    # print(data$reach_list$slope2)
+    # bonk
+    
+
 
   # Check if data is valid
+    #this changes dimensions of data!!!!
   width <- data$reach_list$width[!is.na(data$reach_list$width)]
   wse <- data$reach_list$wse[!is.na(data$reach_list$wse)]
   slope <- data$reach_list$slope[!is.na(data$reach_list$slope)]
+    
+
+    #this doesn't guarantee these are the sazme!!!
   if (length(width) > 1 || length(wse) > 1 || length(slope) > 1) {
     
     # Apply flags to reach and node data
@@ -479,6 +567,12 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
                                          # wse_r_u_max=GLOBAL_PARAMS$wse_r_u_max,
                                          # slope_r_u_max=GLOBAL_PARAMS$slope_r_u_max,
                                          obs_frac_min=GLOBAL_PARAMS$obs_frac_min)
+      
+      #all NA here
+      # print('after apply_flags_reach')
+      # print(reach_diag_data$data$slope)
+      # bonk
+    
     reach_list <- reach_diag_data$data
     reach_flags <- reach_diag_data$flags
     node_diag_data <- apply_flags_node(data$node_list, 
@@ -502,6 +596,10 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
     reach_ses_diags <- sesame_street(reach_list, GLOBAL_PARAMS$Tukey_number)
     reach_list <- reach_ses_diags$data
     reach_outliers <- reach_ses_diags$flags
+     
+      # print('additional reach outlier flags')
+      # print(reach_outliers)
+      
     node_ses_diags <- sesame_street(node_list, GLOBAL_PARAMS$Tukey_number)
     node_list <- node_ses_diags$data
     node_outliers <- node_ses_diags$flags
@@ -516,6 +614,9 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
 #' @return dataframe
 low_slope=function(data, sword_slope, min_slope, level){
   
+# if(!nrow(data$width>1)){
+# print('read into low slope diags')
+#     print(data$slope)}
 
 ###MIXED SLOPE TOGGLE 1/2/25
 
@@ -531,8 +632,8 @@ if (sword_slope > min_slope) {
     #reset any slope less than the minimum slope value to the slope value
     data$slope[data$slope< min_slope]= slope_value
     data$slope2[data$slope2< min_slope]= slope_value
-    #return a '1' where we have masked to slope
-    #the +() syntax will binarize
+    # #return a '1' where we have masked to slope
+    # #the +() syntax will binarize
     slope_flags=+(data$slope< min_slope)
 
     
@@ -567,6 +668,9 @@ if (sword_slope > min_slope) {
       
 #    }
     #### fixed slope toggle end
+    # if(!nrow(data$width>1)){
+    # print('coming out of low slope diags')
+    # print(data$slope)}
 
       return(list(data=data, flags=slope_flags))
 
@@ -577,6 +681,11 @@ if (sword_slope > min_slope) {
       reach_low_slope_diags <- low_slope(data=reach_list, sword_slope=data$sword_slope,
                                          min_slope=GLOBAL_PARAMS$prior_slope_min, level="reach")
       reach_list <- reach_low_slope_diags$data
+      
+      # print('after low slope diags')
+      # print(reach_list$slope)
+      # bonk
+      
       reach_slope_flags <- reach_low_slope_diags$flags
       
       node_low_slope_diags <- low_slope(data=node_list, sword_slope=data$sword_slope,
@@ -635,4 +744,4 @@ if (sword_slope > min_slope) {
     } else {
     message(paste0(reach_files$reach_id, ": Invalid data; node and reach files not modified."))
   }
-}
+} #end run diagnostics
