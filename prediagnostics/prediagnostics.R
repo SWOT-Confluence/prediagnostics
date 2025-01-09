@@ -107,6 +107,8 @@ apply_flags_reach=function(data, ice_max, dark_max, xover_cal_q_max,
   obs_frac_flag = data$obs_frac_n
     
     
+    
+    
   # deprecated v0002  
   # wse_u_flag=data$wse_r_u
   # slope_u_flag=data$slope_r_u
@@ -137,8 +139,13 @@ apply_flags_reach=function(data, ice_max, dark_max, xover_cal_q_max,
 
     this_vector= (+(bitwAnd(bitwise_in, 2^seq(0,28))>0))
     this_flags=which(this_vector == 1)
+     
+     #    print(this_flags)
+     # print(target_flags)
 
     bitfail= any(this_flags %in% target_flags)
+     
+     # print(bitfail)
      #return 0 if it fails, which means that the 'fail' condition is set to true
     if(bitfail == TRUE){return(0)}else{return(1)}
         }
@@ -153,15 +160,15 @@ apply_flags_reach=function(data, ice_max, dark_max, xover_cal_q_max,
     dark_flag = +(dark_flag <= dark_max)
     xover_flag = +(xover_flag <= xover_cal_q_max)
     prior_width_flag = +(prior_width >= prior_width_min)
+
     #make a matrix of bitwise filtered data
     bitwise_flag = do.call(cbind,lapply(bitwise_flag,bitwiser,target_bit_in= target_bit_reach))
-
     
     #get the xtrack distance and filter for both min and max, add, and return anything =2
     #retun 1 for greater than the min
-    xtrack_flag_min = +(xtrack_flag >= cross_track_dist_min_m)
+    xtrack_flag_min = +(abs(xtrack_flag) >= cross_track_dist_min_m)
     #retun 1 for less than than the max
-    xtrack_flag_max = +(xtrack_flag <= cross_track_dist_max_m)
+    xtrack_flag_max = +(abs(xtrack_flag) <= cross_track_dist_max_m)
     #combine (slowly, but for repro)
     xtrack_combined= xtrack_flag_max + xtrack_flag_min
     #we want values ==2
@@ -220,21 +227,28 @@ master_flag=ice_flag*dark_flag*xover_flag*prior_width_flag*bitwise_flag*reach_le
     ntot=sum(master_flag)
     
 
-    
-  Wobs=data$width
+  
+    Wobs=data$width
+     # print('wse')
   Hobs=data$wse
+     # print('slope')
   Sobs=data$slope
+     # print('slope')
   S2obs=data$slope2
     
     # print('after flags defined')
     # print(data)
     
-    # print('slope on first read into the flags function')
+    # print('as first on first read into the flags function')
+    #   print('slopes')
     # print(Sobs)
+    # print('wse')
     # print(Hobs)
-    # print(Sobs)
+    # print('width')
+    # print(Wobs)
+    # print('slope2')
     # print(S2obs)
-    # bonk
+    # # bonk
     
 #     print('master flag')
 #     print(master_flag)
@@ -401,8 +415,12 @@ apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max,
 
     this_vector= (+(bitwAnd(bitwise_in, 2^seq(0,28))>0))
     this_flags=which(this_vector == 1)
+     
+  
 
     bitfail= any(this_flags %in% target_flags)
+     
+
      #return 0 if it fails, which means that the 'fail' condition is set to true 
     if(bitfail == TRUE){return(0)}else{return(1)}
         }
@@ -431,11 +449,12 @@ apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max,
     #get the xtrack distance and filter for both min and max, add, and return anything =2
     #retun 1 for greater than the min
     
-    
-    xtrack_flag_min = +(xtrack_flag >= cross_track_dist_min_m)
+    #swath values can go negative, so use abs xtrack distance
+    # print(xtrack_flag)
+    xtrack_flag_min = +(abs(xtrack_flag) >= cross_track_dist_min_m)
     
     #retun 1 for less than than the max
-    xtrack_flag_max = +(xtrack_flag <= cross_track_dist_max_m)
+    xtrack_flag_max = +(abs(xtrack_flag) <= cross_track_dist_max_m)
     
     #combine (slowly, but for repro)
     xtrack_combined= xtrack_flag_max + xtrack_flag_min
