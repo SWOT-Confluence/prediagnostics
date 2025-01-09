@@ -20,10 +20,10 @@ write_data <- function(reach_list, node_list, reach_flags, node_flags,
                        swot_file, output_dir, GLOBAL_PARAMS, data) {
   
 
-    print('data to be written')
-     print(reach_list)
-     print(reach_flags)
-    bonk
+    # print('data to be written')
+    #  print(reach_list)
+    #  print(reach_flags)
+    # bonk
   # Update SWOT files
 
   update_swot(swot_file, reach_list, node_list)
