@@ -155,11 +155,17 @@ apply_flags_reach=function(data, ice_max, dark_max, xover_cal_q_max,
     prior_width_flag = +(prior_width >= prior_width_min)
     #make a matrix of bitwise filtered data
     bitwise_flag = do.call(cbind,lapply(bitwise_flag,bitwiser,target_bit_in= target_bit_reach))
-    #get the xtrack distance and filter for both min and max, add, and return anything >0,
-    #i.e. any place either flag is tripped
+
+    
+    #get the xtrack distance and filter for both min and max, add, and return anything =2
+    #retun 1 for greater than the min
     xtrack_flag_min = +(xtrack_flag >= cross_track_dist_min_m)
+    #retun 1 for less than than the max
     xtrack_flag_max = +(xtrack_flag <= cross_track_dist_max_m)
-    xtrack_flag= +( (xtrack_flag_min + xtrack_flag_max) >0 ) 
+    #combine (slowly, but for repro)
+    xtrack_combined= xtrack_flag_max + xtrack_flag_min
+    #we want values ==2
+    xtrack_flag= +( xtrack_combined ==2 ) 
     
     reach_length_flag = +(reach_length_flag >= reach_length_min_m)
     
@@ -351,6 +357,17 @@ apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max,
   xtrack_flag=data$cross_track_dist
   n_good_pix= data$n_good_pix 
     
+    # print(n_good_pix)
+  # Wobs=data$width
+  # Hobs=data$wse
+  # Sobs=data$slope
+  # S2obs=data$slope2
+    
+    # print(Wobs)
+    
+    # print(xtrack_flag)
+    
+    
     #deprecated v0002
   # wse_u_flag=data$wse_r_u
   # slope_u_flag=data$slope_r_u
@@ -400,7 +417,7 @@ apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max,
     prior_width_flag = +(prior_width >= prior_width_min)
     #in node mode, we need to apply bitwiser to all elements of the matrix
     bitwise_flag_node=matrix(nrow=nrow(bitwise_flag),ncol=ncol(bitwise_flag))
-    good_pix_flag= +(n_good_pix <= n_node_pix_min)
+    good_pix_flag= +(n_good_pix >= n_node_pix_min)
     
     for (i in 1:nrow(bitwise_flag)){
         for(j in 1:ncol(bitwise_flag)){
@@ -411,11 +428,23 @@ apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max,
 
     bitwise_flag = bitwise_flag_node
     
-    #get the xtrack distance and filter for both min and max, add, and return anything >0,
-    #i.e. any place either flag is tripped
+    #get the xtrack distance and filter for both min and max, add, and return anything =2
+    #retun 1 for greater than the min
+    
+    
     xtrack_flag_min = +(xtrack_flag >= cross_track_dist_min_m)
+    
+    #retun 1 for less than than the max
     xtrack_flag_max = +(xtrack_flag <= cross_track_dist_max_m)
-    xtrack_flag= +( (xtrack_flag_min + xtrack_flag_max) >0 ) 
+    
+    #combine (slowly, but for repro)
+    xtrack_combined= xtrack_flag_max + xtrack_flag_min
+    
+    # print(xtrack_combined)
+    #we want values ==2
+    xtrack_flag= +( xtrack_combined ==2 ) 
+    
+    # print(xtrack_flag)
     
     # deprecated v0002
     # wse_u_flag = +(wse_u_flag <= wse_r_u_max)
@@ -449,12 +478,63 @@ apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max,
   Hobs=data$wse
   Sobs=data$slope
   S2obs=data$slope2
+    
+
+    # print('slope on first read into the flags function')
+    # print(Sobs)
+    # print(Hobs)
+    # print(Sobs)
+    # print(S2obs)
+
+    
+    # print('master flag')
+    # print(master_flag)
   
   # Find anywhere where 0 and replace with NA
   Wobs[master_flag == 0]=NA
   Hobs[master_flag == 0]=NA
   Sobs[master_flag == 0]=NA
   S2obs[master_flag == 0]=NA
+    
+#         print('after NA assignments')
+#     print(Sobs)
+#     print(Hobs)
+#     print(Sobs)
+#     print(S2obs)
+    
+      
+
+    
+#     print('ice')
+#     print(sum(ice_flag==0))
+    
+#     print('dark')
+#     print(sum(dark_flag==0))#=matrix(dark_flag,nrow=1,ncol=length(dark_flag))
+    
+#     print('xover')
+#     print(sum(xover_flag==0))#=matrix(xover_flag,nrow=1,ncol=length(xover_flag))
+    
+#     print('p_width')
+#     print(sum(prior_width_flag==0))#=matrix(prior_width_flag,nrow=1,ncol=length(prior_width_flag))
+    
+#     print('bitwise')
+#     print(sum(bitwise_flag==0))#=matrix(bitwise_flag,nrow=1,ncol=length(bitwise_flag))
+    
+#     print('xtrack')
+#     print(sum(xtrack_flag==0))#=matrix(xtrack_flag,nrow=1,ncol=length(xtrack_flag))
+
+#     print('good pix')
+#     print(sum(good_pix_flag==0))#=matrix(obs_frac_flag,nrow=1,ncol=length(obs_frac_flag))
+    
+#     print('total flagged')
+#     print(sum(master_flag==0))
+    
+#     print('total nt')
+#     print(nrow(ice_flag)*ncol(ice_flag))
+    
+    
+    # bonk
+
   
     #rewrite
   data$width=Wobs
@@ -535,10 +615,10 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
   data <- get_data(reach_files)
     
     # print('slope on first read from /mnt')
-    # print(data$reach_list$slope)
-    # print(data$reach_list$wse)
-    # print(data$reach_list$slope)
-    # print(data$reach_list$slope2)
+    # print(data$node_list$wse)
+    # # print(data$reach_list$wse)
+    # # print(data$reach_list$slope)
+    # # print(data$reach_list$slope2)
     # bonk
     
 
@@ -589,7 +669,8 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
     node_list <- node_diag_data$data
     node_flags <- node_diag_data$flags
 
-
+    # print('after apply flags node')
+    #   print(head(node_list))
 
     
     # Apply sesame street filter to reach and node data
@@ -604,7 +685,8 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
     node_list <- node_ses_diags$data
     node_outliers <- node_ses_diags$flags
       
-      
+      #  print('after sesame  node')
+      # print(head(node_list))
 
       #' Apply filter to filter out low slope
 #'

@@ -19,11 +19,12 @@ write_data <- function(reach_list, node_list, reach_flags, node_flags,
                        node_slope_flags, reach_dxa_flags, node_dxa_flags, 
                        swot_file, output_dir, GLOBAL_PARAMS, data) {
   
-    # print('data passed to outlier writer')
-    # print(reach_outliers)
-    # print('reach flags')
-    # print(reach_flags)
+
+    # print('data to be written')
+    # print(node_list$slope2)
+    # bonk
   # Update SWOT files
+
   update_swot(swot_file, reach_list, node_list)
     
   
@@ -45,7 +46,7 @@ update_swot <- function(swot_file, reach_list, node_list) {
     # print(reach_list$slope)
 
 
- # bonk
+
     
   swot <- open.nc(swot_file, write=TRUE)
   # Reach
