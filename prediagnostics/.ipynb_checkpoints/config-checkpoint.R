@@ -38,21 +38,21 @@
 
 # Jan 17 2025 v "strict" params
 GLOBAL_PARAMS = list (
-     prior_width_min_m = 80 ,
-     prior_slope_min = 1.7e-5,
-     reach_length_min_m=7000,
-     cross_track_dist_min_m= 15000,
-     cross_track_dist_max_m= 600000, #setting to high number to reflect no max in OG
-     ice_max = 0,
-     target_bit_reach= 168298510, #FUNCTIONALLY EQUIVALENT TO _q<=2
-     target_bit_node=  168298510, #adds flags 9,10, 11, 23, and 24 to the reach
-     dark_max = 0.1,
-     obs_frac_min= 0.01, #setting super low to recreate a new filter
-     xover_cal_q_max = 1,
-     Tukey_number = 1.5,
-     n_node_pix_min =1 #functionally turning off to recreate a new filter
-     # slope_r_u_max=10e-5 ## deprecated in v002
-     # wse_r_u_max = 0.5 ## deprecated in v002
+     prior_width_min_m = 80 ,#same as Kostas
+     prior_slope_min = 1.7e-5,#same as Kostas
+     reach_length_min_m=7000,#same as Kostas
+     cross_track_dist_min_m= 15000,#same as Kostas
+     cross_track_dist_max_m= 600000, #setting to high number to reflect no max in Kostas run
+     ice_max = 0,#same as Kostas
+     target_bit_reach= 168298510, #same as Kostas
+     target_bit_node=  168298510, #same as Kostas
+     dark_max = 0.1,#same as Kostas
+     obs_frac_min= 0.01, #setting super low to recreate Kostas run, which didn't have this filter
+     xover_cal_q_max = 1,#same as Kostas
+     Tukey_number = 1.5,#same as Kostas
+     n_node_pix_min =1 #setting super low to recreate Kostas run, which didn't have this filter
+     # slope_r_u_max=10e-5 ## deprecated 
+     # wse_r_u_max = 0.5 ## deprecated 
 )
 
 #v 0001 params, pre December 2024
