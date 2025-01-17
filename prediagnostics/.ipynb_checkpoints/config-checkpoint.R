@@ -17,26 +17,43 @@
 #      # wse_r_u_max = 0.5 ## deprecated in v002
 # )
 
-# Jan 13 2025 v "Debug 1" params
+# # Jan 13 2025 v "permissive" params
+# GLOBAL_PARAMS = list (
+#      prior_width_min_m = 80 ,
+#      prior_slope_min = 3.4e-5,
+#      reach_length_min_m=7000,
+#      cross_track_dist_min_m= 10000,
+#      cross_track_dist_max_m= 60000,
+#      ice_max = 0,
+#      target_bit_reach= 507510784, #FUNCTIONALLY EQUIVALENT TO _q<=2
+#      target_bit_node=  532680192 , #adds flags 9,10, 11, 23, and 24 to the reach
+#      dark_max = 0.4,
+#      obs_frac_min= 0.5,
+#      xover_cal_q_max = 1,
+#      Tukey_number = 1.5,
+#      n_node_pix_min =10
+#      # slope_r_u_max=10e-5 ## deprecated in v002
+#      # wse_r_u_max = 0.5 ## deprecated in v002
+# )
+
+# Jan 17 2025 v "strict" params
 GLOBAL_PARAMS = list (
      prior_width_min_m = 80 ,
-     prior_slope_min = 3.4e-5,
+     prior_slope_min = 1.7e-5,
      reach_length_min_m=7000,
-     cross_track_dist_min_m= 10000,
-     cross_track_dist_max_m= 60000,
+     cross_track_dist_min_m= 15000,
+     cross_track_dist_max_m= 600000, #setting to high number to reflect no max in OG
      ice_max = 0,
-     target_bit_reach= 507510784, #FUNCTIONALLY EQUIVALENT TO _q<=2
-     target_bit_node=  532680192 , #adds flags 9,10, 11, 23, and 24 to the reach
-     dark_max = 0.4,
-     obs_frac_min= 0.5,
+     target_bit_reach= 168298510, #FUNCTIONALLY EQUIVALENT TO _q<=2
+     target_bit_node=  168298510, #adds flags 9,10, 11, 23, and 24 to the reach
+     dark_max = 0.1,
+     obs_frac_min= 0.01, #setting super low to recreate a new filter
      xover_cal_q_max = 1,
      Tukey_number = 1.5,
-     n_node_pix_min =10
+     n_node_pix_min =1 #functionally turning off to recreate a new filter
      # slope_r_u_max=10e-5 ## deprecated in v002
      # wse_r_u_max = 0.5 ## deprecated in v002
 )
-
-
 
 #v 0001 params, pre December 2024
 #GLOBAL_PARAMS = list (
