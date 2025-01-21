@@ -33,19 +33,27 @@ index <- index + 1    # Add 1 to AWS 0-based index
 config_bucket <- opts$config_bucket
 reaches_json = file.path(input_dir, opts$reaches_json)
 
-# Load Config file
-use_python(PYTHON_EXE)
-source_python(PYTHON_FILE)
+# Load Config file from S3
+if (config_bucket != "") {
+  use_python(PYTHON_EXE)
+  source_python(PYTHON_FILE)
 
-config_filepath = file.path(TMP_PATH, "config.R")
-download_sos(config_bucket, config_filepath)
+  config_filepath = file.path(TMP_PATH, "config.R")
+  download_sos(config_bucket, config_filepath)
 
-# Run Diagnostics
-if (file.exists(config_filepath)) {
-  source(config_filepath)
-  output=run_diagnostics(input_dir, reaches_json, index, output_dir)
+  # Run Diagnostics on S3 config file
+  if (file.exists(config_filepath)) {
+    source(config_filepath)
+    output=run_diagnostics(input_dir, reaches_json, index, output_dir)
+  } else {
+    print("Config file could not be downloaded and prediagnostics will not run.")
+  }
+
+ # Run Diagnostics on local config file
 } else {
-  print("Config file could not be downloaded and prediagnostics will not run.")
+  print("Config file will be run on local config: '/app/prediagnostics/config.R'")
+  source("/app/prediagnostics/config.R")
+  output=run_diagnostics(input_dir, reaches_json, index, output_dir)
 }
 
 end = Sys.time()
