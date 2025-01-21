@@ -46,6 +46,7 @@ RUN apt update && apt -y install python3 python3-dev python3-pip python3-venv py
 # STAGE 3 set up I/O directories, copy geobamdata installer and R script
 FROM stage2 as stage3
 COPY ./prediagnostics/ /app/prediagnostics/
+COPY ./sos_read /app/prediagnostics/sos_read/
 
 # STAGE 4 - Execute algorithm
 FROM stage3 as stage4
