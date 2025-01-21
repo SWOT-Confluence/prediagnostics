@@ -1,8 +1,8 @@
 library(optparse)
 library(reticulate)
 
-source("/app/prediagnostics/config.R")
 source("/app/prediagnostics/input.R")
+source("/app/prediagnostics/output.R")
 source("/app/prediagnostics/prediagnostics.R")
 
 PYTHON_EXE = "/usr/bin/python3"
