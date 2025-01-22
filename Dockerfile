@@ -6,7 +6,7 @@ RUN echo "America/New_York" | tee /etc/timezone \
 		build-essential \
 		gcc \
 		gfortran \
-        locales \
+    locales \
 		libcurl4-gnutls-dev \
 		libfontconfig1-dev \
 		libfribidi-dev \
@@ -34,15 +34,22 @@ RUN apt -y install \
 		r-base \
 		r-base-dev \
 	&& /usr/bin/Rscript -e "install.packages('RNetCDF', dependencies=TRUE, repos='http://cran.rstudio.com/')" \
-    && /usr/bin/Rscript -e "install.packages('rjson', dependencies=TRUE, repos='http://cran.rstudio.com/')"\
-	&& /usr/bin/Rscript -e "install.packages('dplyr', dependencies=TRUE, repos='http://cran.rstudio.com/')"
+    && /usr/bin/Rscript -e "install.packages('rjson', dependencies=TRUE, repos='http://cran.rstudio.com/') "\
+	&& /usr/bin/Rscript -e "install.packages('dplyr', dependencies=TRUE, repos='http://cran.rstudio.com/')" \
+	&& /usr/bin/Rscript -e "install.packages('reticulate', dependencies=TRUE, repos='http://cran.rstudio.com/')" \
+	&& /usr/bin/Rscript -e "install.packages('optparse', dependencies=TRUE, repos='http://cran.rstudio.com/')"
 
-# STAGE 2 set up I/O directories, copy geobamdata installer and R script
+# STAGE 2 - Python and python packages for S3 functionality
 FROM stage1 as stage2
-COPY ./prediagnostics/ /app/prediagnostics/
+RUN apt update && apt -y install python3 python3-dev python3-pip python3-venv python3-boto3
 
-# STAGE 3 - Execute algorithm
+# STAGE 3 set up I/O directories, copy geobamdata installer and R script
 FROM stage2 as stage3
+COPY ./prediagnostics/ /app/prediagnostics/
+COPY ./sos_read /app/prediagnostics/sos_read/
+
+# STAGE 4 - Execute algorithm
+FROM stage3 as stage4
 LABEL version="1.0" \
 	description="Containerized prediagnostics module." \
 	"confluence.contact"="ntebaldi@umass.edu" \
