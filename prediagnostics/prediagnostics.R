@@ -719,56 +719,88 @@ low_slope=function(data, sword_slope, min_slope, level){
 # print('read into low slope diags')
 #     print(data$slope)}
 
-###MIXED SLOPE TOGGLE 1/2/25
+###MIXED SLOPE TOGGLE 1/2/25---------------------
 
     #we want to use the sword slope, unless it is less than the slope minimum
     #check sword against the slope min, and then assign whichever is higher to 
     #swot data that are < the slope minimum.
-if (sword_slope > min_slope) {
-    slope_value <- sword_slope
-  } else {
-    slope_value <- min_slope
-}
+# if (sword_slope > min_slope) {
+#     slope_value <- sword_slope
+#   } else {
+#     slope_value <- min_slope
+# }
 
-    #reset any slope less than the minimum slope value to the slope value
-    data$slope[data$slope< min_slope]= slope_value
-    data$slope2[data$slope2< min_slope]= slope_value
-    # #return a '1' where we have masked to slope
-    # #the +() syntax will binarize
-    slope_flags=+(data$slope< min_slope)
+#     #reset any slope less than the minimum slope value to the slope value
+#     data$slope[data$slope< min_slope]= slope_value
+#     data$slope2[data$slope2< min_slope]= slope_value
+#     # #return a '1' where we have masked to slope
+#     # #the +() syntax will binarize
+#     slope_flags=+(data$slope< min_slope)
 
-    
     # print(slope_flags)
-### mixed slope toggle end
+### mixed slope toggle end----------------------
    
  
-# ### FIXED SLOPE TOGGLE 1/2/25    
-#   if (any(data$slope< min_slope,na.rm=TRUE)){
-#       slope_value=sword_slope
+### FIXED SLOPE TOGGLE 1/2/25  ------------------
+  #in this case, if we have low slopes, we want to set all slopes to a constant value equal to the 
+    #sword slope, which approximates the bed slope. This prevents behavior where HWS appaear to vary
+    #out of step one another
+    
 
-#       # Set slope and slope2
-#       length = dim(data$slope)
+# if (sword_slope > min_slope) {
+    slope_value = sword_slope
+#   } else {
+#     slope_value = min_slope
+# }
+    
+    #dont write if the input is all NA, this will be confusing later
+    if(all(is.na(data$slope))){
+        # print('allna')
+            length = dim(data$slope)
+          if (level == "reach") {
+      
+            slope_flags <- rep(1, times=length)
+          } else {
+         
+            slope_flags <- array(1, dim=length)
+          }
+      
+       
+        return(list(data=data, flags=slope_flags))}
+    
+  if (any(data$slope< slope_value,na.rm=TRUE)){
+      
+        # print(paste('low slope on',level))
+      # print(slope_value)
+
+      # Set slope and slope2
+      length = dim(data$slope)
    
-#           if (level == "reach") {
-#             data$slope <-  rep(slope_value, times=length)
-#             data$slope2 <- rep(slope_value, times=length)
-#             slope_flags <- rep(1, times=length)
-#           } else {
-#             data$slope <-  array(slope_value, dim=length)
-#             data$slope2 <- array(slope_value, dim=length)
-#             slope_flags <- array(1, dim=length)
-#           }
+          if (level == "reach") {
+            data$slope <-  rep(slope_value, times=length)
+            data$slope2 <- rep(slope_value, times=length)
+            slope_flags <- rep(1, times=length)
+          } else {
+            data$slope <-  array(slope_value, dim=length)
+            data$slope2 <- array(slope_value, dim=length)
+            slope_flags <- array(1, dim=length)
+          }
       
-#       } else {
-#          length = dim(data$slope)
-#         if (level == "reach") {
-#             slope_flags <- rep(0, times=length)
-#             } else {
-#             slope_flags <- array(0, dim=length)
-#         }  
+            
+#       print(data$slope)
+#       bonk
       
-#    }
-    #### fixed slope toggle end
+      } else {
+         length = dim(data$slope)
+        if (level == "reach") {
+            slope_flags <- rep(0, times=length)
+            } else {
+            slope_flags <- array(0, dim=length)
+        }  
+
+      
+   }
+    ### fixed slope toggle end------------------
     # if(!nrow(data$width>1)){
     # print('coming out of low slope diags')
     # print(data$slope)}
@@ -833,8 +865,12 @@ if (sword_slope > min_slope) {
 #        ##end debugging toggle---------------
       
     
+#       print('reach')
+#     print(reach_list$slope)
+#       print('node')
+#       print(node_list$slope)
       
-
+#       bonk
       
 #output of diagnostics
     write_data(reach_list, node_list, reach_flags, node_flags, reach_outliers, 
