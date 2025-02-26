@@ -5,6 +5,7 @@ source("/app/prediagnostics/input.R")
 source("/app/prediagnostics/output.R")
 source("/app/prediagnostics/prediagnostics.R")
 
+CONFIG_FILENAME = "prediagnostics_config.R"
 PYTHON_EXE = "/usr/bin/python3"
 PYTHON_FILE = "/app/prediagnostics/sos_read/sos_read.py"
 TMP_PATH = "/tmp"
@@ -38,7 +39,7 @@ if (config_bucket != "") {
   use_python(PYTHON_EXE)
   source_python(PYTHON_FILE)
 
-  config_filepath = file.path(TMP_PATH, "config.R")
+  config_filepath = file.path(TMP_PATH, CONFIG_FILENAME)
   download_sos(config_bucket, config_filepath)
 
   # Run Diagnostics on S3 config file
