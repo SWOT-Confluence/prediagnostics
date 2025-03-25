@@ -52,8 +52,8 @@ if (config_bucket != "") {
 
  # Run Diagnostics on local config file
 } else {
-  print("Config file will be run on local config: '/app/prediagnostics/config.R'")
-  source("/app/prediagnostics/config.R")
+  print("Config file will be run on local config: '/mnt/data/input/prediagnostics_custom_config.R'")
+  source("/mnt/data/input/prediagnostics_custom_config.R")
   output=run_diagnostics(input_dir, reaches_json, index, output_dir)
 }
 
