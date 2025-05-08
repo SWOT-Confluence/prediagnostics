@@ -26,8 +26,7 @@ get_reach_files <- function(reaches_json, input_dir, index) {
 #'
 #' @return named list of node named list and reach named list
 get_data <- function(reach_files) {
-    
- 
+
   
   # Retrieve SWOT data
   swot <- open.nc(reach_files$swot)
@@ -37,15 +36,15 @@ get_data <- function(reach_files) {
   time_str = var.get.nc(r_grp, "time_str")
   close.nc(swot)
     
-#     ##-------------------------------------------------------
-#    #debugging toggle for when patched sword is not avaailable
-#    sword_base='/nas/cee-water/cjgleason/data/SWORD/SWORDv16/netcdf/'
-#     bleh=reach_files$sword
-#     split1=strsplit(bleh,'/')[[1]][11]
-#     split2=paste(strsplit(split1,'_')[[1]][1:3],collapse="_")
-#     split3=paste0(split2,'.nc')
-#     reach_files$sword=paste0(sword_base,split3)
-#      ##-------------------------------------------------------
+    ##-------------------------------------------------------
+   #debugging toggle for when patched sword is not avaailable
+   sword_base='/nas/cee-water/cjgleason/data/SWORD/SWORDv16/netcdf/'
+    bleh=reach_files$sword
+    split1=strsplit(bleh,'/')[[1]][11]
+    split2=paste(strsplit(split1,'_')[[1]][1:3],collapse="_")
+    split3=paste0(split2,'.nc')
+    reach_files$sword=paste0(sword_base,split3)
+     ##-------------------------------------------------------
 
 
   
