@@ -8,15 +8,15 @@
 #' @param output_dir string path to output directory
 run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
     
-    #debuggng
-source("/nas/cee-water/cjgleason/colin/prediagnostics/prediagnostics/input.R")
-source("/nas/cee-water/cjgleason/colin/prediagnostics/prediagnostics/output.R")
-source("/nas/cee-water/cjgleason/colin/prediagnostics/prediagnostics/prediagnostics.R")
-source("/nas/cee-water/cjgleason/colin/prediagnostics/prediagnostics/outlier_filter.R")
-source("/nas/cee-water/cjgleason/colin/prediagnostics/prediagnostics/apply_flags_reach.R")
-source("/nas/cee-water/cjgleason/colin/prediagnostics/prediagnostics/apply_flags_node.R")
-source("/nas/cee-water/cjgleason/colin/prediagnostics/prediagnostics/filter_dxa.R")
-source("/nas/cee-water/cjgleason/colin/prediagnostics/prediagnostics/config.R")
+#     #debuggng
+# source("/nas/cee-water/cjgleason/colin/prediagnostics/prediagnostics/input.R")
+# source("/nas/cee-water/cjgleason/colin/prediagnostics/prediagnostics/output.R")
+# source("/nas/cee-water/cjgleason/colin/prediagnostics/prediagnostics/prediagnostics.R")
+# source("/nas/cee-water/cjgleason/colin/prediagnostics/prediagnostics/outlier_filter.R")
+# source("/nas/cee-water/cjgleason/colin/prediagnostics/prediagnostics/apply_flags_reach.R")
+# source("/nas/cee-water/cjgleason/colin/prediagnostics/prediagnostics/apply_flags_node.R")
+# source("/nas/cee-water/cjgleason/colin/prediagnostics/prediagnostics/filter_dxa.R")
+# source("/nas/cee-water/cjgleason/colin/prediagnostics/prediagnostics/config.R")
 
     
     library(dplyr)
