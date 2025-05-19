@@ -15,24 +15,18 @@ library(RNetCDF)
 #' @param reach_dxa_flags Indicates where d_x_area has been overwritten with NA
 #' @param node_dxa_flags Indicates where d_x_area has been overwritten with NA
 write_data <- function(reach_list, node_list, reach_flags, node_flags, 
-                       reach_outliers, node_outliers, reach_slope_flags, 
-                       node_slope_flags, reach_dxa_flags, node_dxa_flags, 
+                       reach_outliers, node_outliers, 
+                     reach_dxa_flags, node_dxa_flags, 
                        swot_file, output_dir, GLOBAL_PARAMS, data) {
   
 
-    # print('data to be written')
-    #  print(reach_list)
-    #  print(reach_flags)
-    # bonk
-  # Update SWOT files
 
   update_swot(swot_file, reach_list, node_list)
     
   
   # Record results of prediagnostics
 record_results(output_dir, reach_list$reach_id, reach_flags, node_flags, 
-                 reach_outliers, node_outliers, reach_slope_flags, 
-                 node_slope_flags, reach_dxa_flags, node_dxa_flags, data)
+                 reach_outliers, node_outliers, reach_dxa_flags, node_dxa_flags, data)
   
 }
 
@@ -92,8 +86,7 @@ add_global_attributes <- function(nc, params) {
 #' @param reach_dxa_flags Indicates where d_x_area has been overwritten with NA
 #' @param node_dxa_flags Indicates where d_x_area has been overwritten with NA 
 record_results <- function(output_dir, reach_id, reach_flags, node_flags,
-                           reach_outliers, node_outliers, reach_slope_flags,
-                           node_slope_flags, reach_dxa_flags, node_dxa_flags, data) {
+                           reach_outliers, node_outliers,  reach_dxa_flags, node_dxa_flags, data) {
   
   nc_file = paste(output_dir, paste0(reach_id, "_prediagnostics.nc"), sep=.Platform$file.sep)
   nc_out = create.nc(nc_file, format="netcdf4")
@@ -119,10 +112,11 @@ record_results <- function(output_dir, reach_id, reach_flags, node_flags,
   # Groups and variables
   fill = -999
   r_grp = grp.def.nc(nc_out, "reach")
-  write_reach_flags(r_grp, reach_flags, reach_outliers, reach_slope_flags, reach_dxa_flags, fill)
+  write_reach_flags(r_grp, reach_flags, reach_outliers,  reach_dxa_flags, fill)
   
   n_grp = grp.def.nc(nc_out, "node")
-  write_node_flags(n_grp, node_flags, node_outliers, node_slope_flags, node_dxa_flags, fill)
+  write_node_flags(n_grp, node_flags, node_outliers, node_dxa_flags, fill)
+    
   
   close.nc(nc_out)
   
@@ -137,7 +131,7 @@ record_results <- function(output_dir, reach_id, reach_flags, node_flags,
 #' @param reach_dxa_flags Indicates where d_x_area has been overwritten with NA
 #' @param fill integer missing value
 write_reach_flags <- function(r_grp, reach_flags, reach_outliers, 
-                              reach_slope_flags, reach_dxa_flags, fill) {
+                               reach_dxa_flags, fill) {
   
 
 
@@ -252,7 +246,14 @@ write_reach_flags <- function(r_grp, reach_flags, reach_outliers,
   att.put.nc(r_grp, "low_slope_flag", "flag_values", "NC_STRING", "0 1")
   att.put.nc(r_grp, "low_slope_flag", "flag_meanings", "NC_STRING", "not_overwritten overwritten")
   att.put.nc(r_grp, "low_slope_flag", "_FillValue", "NC_INT", fill)
-  var.put.nc(r_grp, "low_slope_flag", reach_slope_flags)
+    
+    #hotfix for slope patch, elimiante when re piped
+    reach_slope_flags = reach_flags$reach_length_flag
+    reach_slope_flags[reach_flags$reach_slope_flags==0] = 0
+    reach_slope_flags[reach_flags$reach_slope_flags==1] = 0
+    
+    
+  var.put.nc(r_grp, "low_slope_flag",  fill)
   
   var.def.nc(r_grp, "d_x_area_flag", "NC_INT", "time_steps")
   att.put.nc(r_grp, "d_x_area_flag", "long_name", "NC_STRING", "Indicates if d_x_area flag was overwritten with missing value because width or wse was not observed.")
@@ -271,7 +272,7 @@ write_reach_flags <- function(r_grp, reach_flags, reach_outliers,
 #' @param node_slope_flags array node-level low slope flags
 #' @param node_dxa_flags Indicates where d_x_area has been overwritten with NA
 #' @param fill integer missing value
-write_node_flags <- function(n_grp, node_flags, node_outliers, node_slope_flags,
+write_node_flags <- function(n_grp, node_flags, node_outliers,
                              node_dxa_flags, fill) {
 
   # print(node_flags$ice_flag)
@@ -351,7 +352,14 @@ write_node_flags <- function(n_grp, node_flags, node_outliers, node_slope_flags,
   att.put.nc(n_grp, "low_slope_flag", "flag_values", "NC_STRING", "0 1")
   att.put.nc(n_grp, "low_slope_flag", "flag_meanings", "NC_STRING", "not_overwritten overwritten")
   att.put.nc(n_grp, "low_slope_flag", "_FillValue", "NC_INT", fill)
-  var.put.nc(n_grp, "low_slope_flag", node_slope_flags)
+    
+        #hotfix for slope patch, elimiante when re piped
+    node_flags$node_slope_flags =node_flags$ice_flag
+   node_flags$node_slope_flags [node_flags$node_slope_flags ==0] = 0
+   node_flags$node_slope_flags [node_flags$node_slope_flags ==1] = 0
+    
+
+  var.put.nc(n_grp, "low_slope_flag", node_flags$node_slope_flags)
 
   var.def.nc(n_grp, "d_x_area_flag", "NC_INT", c("num_nodes", "time_steps"))
   att.put.nc(n_grp, "d_x_area_flag", "long_name", "NC_STRING", "Indicates if d_x_area flag was overwritten with missing value because width or wse was not observed.")

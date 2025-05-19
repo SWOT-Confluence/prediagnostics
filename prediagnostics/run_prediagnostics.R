@@ -1,9 +1,14 @@
 library(optparse)
 library(reticulate)
 
+
 source("/app/prediagnostics/input.R")
 source("/app/prediagnostics/output.R")
 source("/app/prediagnostics/prediagnostics.R")
+source("/app/prediagnostics/outlier_filter.R")
+source("/app/prediagnostics/apply_flags_reach.R")
+source("/app/prediagnostics/apply_flags_node.R")
+source("/app/prediagnostics/filter_dxa.R")
 
 CONFIG_FILENAME = "prediagnostics_config.R"
 PYTHON_EXE = "/usr/bin/python3"
