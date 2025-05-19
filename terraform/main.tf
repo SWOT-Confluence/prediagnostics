@@ -45,10 +45,10 @@ locals {
 }
 
 module "confluence-prediagnostics" {
-  source            = "./modules/prediagnostics"
-  app_name          = var.app_name
-  app_version       = var.app_version
-  aws_region        = var.aws_region
+  source = "./modules/prediagnostics"
+  app_name = var.app_name
+  app_version = var.app_version
+  aws_region = var.aws_region
   efs_file_system_ids = {
     input = data.aws_efs_file_system.input.file_system_id
     diagnostics = data.aws_efs_file_system.diagnostics.file_system_id
@@ -56,5 +56,5 @@ module "confluence-prediagnostics" {
   environment = var.environment
   iam_execution_role_arn = data.aws_iam_role.exec.arn
   iam_job_role_arn = data.aws_iam_role.job.arn
-  prefix            = var.prefix
+  prefix = var.prefix
 }
