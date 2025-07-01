@@ -767,39 +767,57 @@ low_slope=function(data, sword_slope, min_slope, level){
       
        
         return(list(data=data, flags=slope_flags))}
+
+  message(paste0("Dealing with slope_option ", GLOBAL_PARAMS$slope_option, " for level ", level))
+  if (GLOBAL_PARAMS$slope_option == 0){
+    if (any(data$slope< slope_value,na.rm=TRUE)){
+        
+          # print(paste('low slope on',level))
+        # print(slope_value)
+
+        # Set slope and slope2
+        length = dim(data$slope)
     
-  if (any(data$slope< slope_value,na.rm=TRUE)){
-      
-        # print(paste('low slope on',level))
-      # print(slope_value)
-
-      # Set slope and slope2
-      length = dim(data$slope)
-   
-          if (level == "reach") {
-            data$slope <-  rep(slope_value, times=length)
-            data$slope2 <- rep(slope_value, times=length)
-            slope_flags <- rep(1, times=length)
-          } else {
-            data$slope <-  array(slope_value, dim=length)
-            data$slope2 <- array(slope_value, dim=length)
-            slope_flags <- array(1, dim=length)
-          }
-      
-            
-#       print(data$slope)
-#       bonk
-      
-      } else {
-         length = dim(data$slope)
-        if (level == "reach") {
-            slope_flags <- rep(0, times=length)
+            if (level == "reach") {
+              data$slope <-  rep(slope_value, times=length)
+              data$slope2 <- rep(slope_value, times=length)
+              slope_flags <- rep(1, times=length)
             } else {
-            slope_flags <- array(0, dim=length)
+              data$slope <-  array(slope_value, dim=length)
+              data$slope2 <- array(slope_value, dim=length)
+              slope_flags <- array(1, dim=length)
+            }
+        } else {
+          length = dim(data$slope)
+          if (level == "reach") {
+              slope_flags <- rep(0, times=length)
+              } else {
+              slope_flags <- array(0, dim=length)
+          }
         }  
+    } else if (GLOBAL_PARAMS$slope_option == 1){
+      length = dim(data$slope)
+      if (level == "reach") {
+        slope_flags <- rep(0, times=length)
+        } else {
+        slope_flags <- array(0, dim=length)
+      }
+    } else if (GLOBAL_PARAMS$slope_option == 2){
+      message(paste0('Replace slope with ', sword_slope, " for level ", level))
+      length = dim(data$slope)
+      if (level == "reach") {
+        data$slope <-  rep(slope_value, times=length)
+        data$slope2 <- rep(slope_value, times=length)
+        slope_flags <- rep(1, times=length)
+      } else {
+        data$slope <-  array(slope_value, dim=length)
+        data$slope2 <- array(slope_value, dim=length)
+        slope_flags <- array(1, dim=length)
+      }
+    } else {
+      stop('Unknown slope_option value ', GLOBAL_PARAMS$slope_option) 
+    }
 
-      
-   }
     ### fixed slope toggle end------------------
     # if(!nrow(data$width>1)){
     # print('coming out of low slope diags')
