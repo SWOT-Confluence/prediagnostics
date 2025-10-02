@@ -90,8 +90,8 @@ sesame_street=function(data,Tukey_number){
 #'
 #' @return dataframe of reach data
 apply_flags_reach=function(data, ice_max, dark_max, xover_cal_q_max, 
-                           prior_width_min,target_bit_reach,cross_track_dist_min_m,
-                           cross_track_dist_max_m,reach_length_min_m,
+                           prior_reach_width_min_m,target_bit_reach,cross_track_dist_reach_min_m,
+                           cross_track_dist_reach_max_m,reach_length_min_m,
                            obs_frac_min){ 
     #deprecated inputs ,slope_r_u_max,wse_r_u_max  v0002
     
@@ -159,16 +159,16 @@ apply_flags_reach=function(data, ice_max, dark_max, xover_cal_q_max,
     ice_flag = +(ice_flag <= ice_max)
     dark_flag = +(dark_flag <= dark_max)
     xover_flag = +(xover_flag <= xover_cal_q_max)
-    prior_width_flag = +(prior_width >= prior_width_min)
+    prior_width_flag = +(prior_width >= prior_reach_width_min_m)
 
     #make a matrix of bitwise filtered data
     bitwise_flag = do.call(cbind,lapply(bitwise_flag,bitwiser,target_bit_in= target_bit_reach))
     
     #get the xtrack distance and filter for both min and max, add, and return anything =2
     #retun 1 for greater than the min
-    xtrack_flag_min = +(abs(xtrack_flag) >= cross_track_dist_min_m)
+    xtrack_flag_min = +(abs(xtrack_flag) >= cross_track_dist_reach_min_m)
     #retun 1 for less than than the max
-    xtrack_flag_max = +(abs(xtrack_flag) <= cross_track_dist_max_m)
+    xtrack_flag_max = +(abs(xtrack_flag) <= cross_track_dist_reach_max_m)
     #combine (slowly, but for repro)
     xtrack_combined= xtrack_flag_max + xtrack_flag_min
     #we want values ==2
@@ -355,8 +355,8 @@ master_flag=ice_flag*dark_flag*xover_flag*prior_width_flag*bitwise_flag*reach_le
 #'
 #' @return dataframe of node-level data
 apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max, 
-                           prior_width_min,target_bit_node,cross_track_dist_min_m,
-                          cross_track_dist_max_m, n_node_pix_min
+                           prior_node_width_min_m,target_bit_node,cross_track_dist_node_min_m,
+                          cross_track_dist_node_max_m, n_node_pix_min
                          ) {
   
     #dprectaed inputs v0002   slope_r_u_max,wse_r_u_max
@@ -432,7 +432,7 @@ apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max,
     ice_flag = +(ice_flag <= ice_max)
     dark_flag = +(dark_flag <= dark_max)
     xover_flag = +(xover_flag <= xover_cal_q_max)
-    prior_width_flag = +(prior_width >= prior_width_min)
+    prior_width_flag = +(prior_width >= prior_node_width_min_m)
     #in node mode, we need to apply bitwiser to all elements of the matrix
     bitwise_flag_node=matrix(nrow=nrow(bitwise_flag),ncol=ncol(bitwise_flag))
     good_pix_flag= +(n_good_pix >= n_node_pix_min)
@@ -451,10 +451,10 @@ apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max,
     
     #swath values can go negative, so use abs xtrack distance
     # print(xtrack_flag)
-    xtrack_flag_min = +(abs(xtrack_flag) >= cross_track_dist_min_m)
+    xtrack_flag_min = +(abs(xtrack_flag) >= cross_track_dist_node_min_m)
     
     #retun 1 for less than than the max
-    xtrack_flag_max = +(abs(xtrack_flag) <= cross_track_dist_max_m)
+    xtrack_flag_max = +(abs(xtrack_flag) <= cross_track_dist_node_max_m)
     
     #combine (slowly, but for repro)
     xtrack_combined= xtrack_flag_max + xtrack_flag_min
@@ -653,15 +653,14 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
   if (length(width) > 1 || length(wse) > 1 || length(slope) > 1) {
     
     # Apply flags to reach and node data
-    
     reach_diag_data <- apply_flags_reach(data$reach_list,
                                          ice_max=GLOBAL_PARAMS$ice_max, 
                                          dark_max=GLOBAL_PARAMS$dark_max, 
                                          xover_cal_q_max=GLOBAL_PARAMS$xover_cal_q_max, 
-                                         prior_width_min=GLOBAL_PARAMS$prior_width_min, 
+                                         prior_reach_width_min_m=GLOBAL_PARAMS$prior_reach_width_min_m, 
                                          target_bit_reach=GLOBAL_PARAMS$target_bit_reach, 
-                                         cross_track_dist_min_m=GLOBAL_PARAMS$cross_track_dist_min_m, 
-                                         cross_track_dist_max_m=GLOBAL_PARAMS$cross_track_dist_max_m,
+                                         cross_track_dist_reach_min_m=GLOBAL_PARAMS$cross_track_dist_reach_min_m, 
+                                         cross_track_dist_reach_max_m=GLOBAL_PARAMS$cross_track_dist_reach_max_m,
                                          reach_length_min_m=GLOBAL_PARAMS$reach_length_min_m,
                                          # wse_r_u_max=GLOBAL_PARAMS$wse_r_u_max,
                                          # slope_r_u_max=GLOBAL_PARAMS$slope_r_u_max,
@@ -678,10 +677,10 @@ run_diagnostics <- function(input_dir, reaches_json, index, output_dir) {
                                          ice_max=GLOBAL_PARAMS$ice_max, 
                                          dark_max=GLOBAL_PARAMS$dark_max, 
                                          xover_cal_q_max=GLOBAL_PARAMS$xover_cal_q_max, 
-                                         prior_width_min=GLOBAL_PARAMS$prior_width_min, 
+                                         prior_node_width_min_m=GLOBAL_PARAMS$prior_node_width_min_m, 
                                          target_bit_node=GLOBAL_PARAMS$target_bit_node, 
-                                         cross_track_dist_min_m=GLOBAL_PARAMS$cross_track_dist_min_m,
-                                         cross_track_dist_max_m=GLOBAL_PARAMS$cross_track_dist_max_m,
+                                         cross_track_dist_node_min_m=GLOBAL_PARAMS$cross_track_dist_node_min_m,
+                                         cross_track_dist_node_max_m=GLOBAL_PARAMS$cross_track_dist_node_max_m,
                                          n_node_pix_min = GLOBAL_PARAMS$n_node_pix_min)
                                          # wse_r_u_max=GLOBAL_PARAMS$wse_r_u_max,
                                          # slope_r_u_max=GLOBAL_PARAMS$slope_r_u_max)
