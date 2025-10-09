@@ -22,7 +22,7 @@
 
 # Jan 13 2025 v "permissive" params
 GLOBAL_PARAMS = list (
-     prior_reach_width_min_m = 60 ,
+     prior_reach_width_min_m = 80 ,
      prior_node_width_min_m = 80 ,
      prior_slope_min = 3.4e-5,
      reach_length_min_m=7000,
