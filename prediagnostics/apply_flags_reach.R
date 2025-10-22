@@ -9,7 +9,7 @@
 #'
 #' @return dataframe of reach data
 apply_flags_reach=function(data, ice_max, dark_max, xover_cal_q_max, 
-                           prior_width_min,target_bit_reach,cross_track_dist_min_m,
+                           prior_reach_width_min_m,target_bit_reach,cross_track_dist_min_m,
                            cross_track_dist_max_m,reach_length_min_m,
                            obs_frac_min){ 
     #deprecated inputs ,slope_r_u_max,wse_r_u_max  v0002
@@ -72,7 +72,7 @@ apply_flags_reach=function(data, ice_max, dark_max, xover_cal_q_max,
     ice_flag = +(ice_flag <= ice_max)
     dark_flag = +(dark_flag <= dark_max)
     xover_flag = +(xover_flag <= xover_cal_q_max)
-    prior_width_flag = +(prior_width >= prior_width_min)
+    prior_width_flag = +(prior_width >= prior_reach_width_min_m)
 
     #make a matrix of bitwise filtered data
     bitwise_flag = do.call(cbind,lapply(bitwise_flag,bitwiser,target_bit_in= target_bit_reach))
