@@ -5,7 +5,7 @@
 #'
 #' @return dataframe of node-level data
 apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max, 
-                           prior_width_min,target_bit_node,cross_track_dist_min_m,
+                           prior_node_width_min_m,target_bit_node,cross_track_dist_min_m,
                           cross_track_dist_max_m, n_node_pix_min
                          ) {
   
@@ -66,7 +66,7 @@ apply_flags_node=function(data, ice_max, dark_max, xover_cal_q_max,
     ice_flag = +(ice_flag <= ice_max)
     dark_flag = +(dark_flag <= dark_max)
     xover_flag = +(xover_flag <= xover_cal_q_max)
-    prior_width_flag = +(prior_width >= prior_width_min)
+    prior_width_flag = +(prior_width >= prior_node_width_min_m)
     #in node mode, we need to apply bitwiser to all elements of the matrix
     bitwise_flag_node=matrix(nrow=nrow(bitwise_flag),ncol=ncol(bitwise_flag))
     good_pix_flag= +(n_good_pix >= n_node_pix_min)
