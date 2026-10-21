@@ -73,6 +73,14 @@ outlier_filter=function(data,Tukey_number){
   return(list(data=data, flags=list(width_flags=width_flags,
                                     wse_flags=wse_flags, 
                                     slope_flags=slope_flags,
-                                    slope2_flags=slope2_flags)))
+                                    slope2_flags=slope2_flags,
+                                    W_upper_outlier=W_upper_outlier,
+                                    W_lower_outlier=W_lower_outlier,
+                                    H_upper_outlier=H_upper_outlier,
+                                    H_lower_outlier=H_lower_outlier,
+                                    S_upper_outlier=S_upper_outlier,
+                                    S_lower_outlier=S_lower_outlier,
+                                    S2_upper_outlier=S2_upper_outlier,
+                                    S2_lower_outlier=S2_lower_outlier)))
   
 }
