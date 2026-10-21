@@ -261,6 +261,55 @@ write_reach_flags <- function(r_grp, reach_flags, reach_outliers,
   att.put.nc(r_grp, "d_x_area_flag", "flag_meanings", "NC_STRING", "not_overwritten overwritten")
   att.put.nc(r_grp, "d_x_area_flag", "_FillValue", "NC_INT", fill)
   var.put.nc(r_grp, "d_x_area_flag", reach_dxa_flags)
+
+  var.def.nc(r_grp, "width_upper_outlier", "NC_DOUBLE", NA)
+  att.put.nc(r_grp, "width_upper_outlier", "long_name", "NC_STRING", "Upper Tukey threshold for width outliers.")
+  att.put.nc(r_grp, "width_upper_outlier", "units", "NC_STRING", "m")
+  att.put.nc(r_grp, "width_upper_outlier", "_FillValue", "NC_DOUBLE", fill)
+  var.put.nc(r_grp, "width_upper_outlier", reach_outliers$W_upper_outlier)
+  
+  var.def.nc(r_grp, "width_lower_outlier", "NC_DOUBLE", NA)
+  att.put.nc(r_grp, "width_lower_outlier", "long_name", "NC_STRING", "Lower Tukey threshold for width outliers.")
+  att.put.nc(r_grp, "width_lower_outlier", "units", "NC_STRING", "m")
+  att.put.nc(r_grp, "width_lower_outlier", "_FillValue", "NC_DOUBLE", fill)
+  var.put.nc(r_grp, "width_lower_outlier", reach_outliers$W_lower_outlier)
+  
+  var.def.nc(r_grp, "wse_upper_outlier", "NC_DOUBLE", NA)
+  att.put.nc(r_grp, "wse_upper_outlier", "long_name", "NC_STRING", "Upper Tukey threshold for wse outliers.")
+  att.put.nc(r_grp, "wse_upper_outlier", "units", "NC_STRING", "m")
+  att.put.nc(r_grp, "wse_upper_outlier", "_FillValue", "NC_DOUBLE", fill)
+  var.put.nc(r_grp, "wse_upper_outlier", reach_outliers$H_upper_outlier)
+  
+  var.def.nc(r_grp, "wse_lower_outlier", "NC_DOUBLE", NA)
+  att.put.nc(r_grp, "wse_lower_outlier", "long_name", "NC_STRING", "Lower Tukey threshold for wse outliers.")
+  att.put.nc(r_grp, "wse_lower_outlier", "units", "NC_STRING", "m")
+  att.put.nc(r_grp, "wse_lower_outlier", "_FillValue", "NC_DOUBLE", fill)
+  var.put.nc(r_grp, "wse_lower_outlier", reach_outliers$H_lower_outlier)
+  
+  var.def.nc(r_grp, "slope_upper_outlier", "NC_DOUBLE", NA)
+  att.put.nc(r_grp, "slope_upper_outlier", "long_name", "NC_STRING", "Upper Tukey threshold for slope outliers.")
+  att.put.nc(r_grp, "slope_upper_outlier", "units", "NC_STRING", "m/m")
+  att.put.nc(r_grp, "slope_upper_outlier", "_FillValue", "NC_DOUBLE", fill)
+  var.put.nc(r_grp, "slope_upper_outlier", reach_outliers$S_upper_outlier)
+  
+  var.def.nc(r_grp, "slope_lower_outlier", "NC_DOUBLE", NA)
+  att.put.nc(r_grp, "slope_lower_outlier", "long_name", "NC_STRING", "Lower Tukey threshold for slope outliers.")
+  att.put.nc(r_grp, "slope_lower_outlier", "units", "NC_STRING", "m/m")
+  att.put.nc(r_grp, "slope_lower_outlier", "_FillValue", "NC_DOUBLE", fill)
+  var.put.nc(r_grp, "slope_lower_outlier", reach_outliers$S_lower_outlier)
+  
+  var.def.nc(r_grp, "slope2_upper_outlier", "NC_DOUBLE", NA)
+  att.put.nc(r_grp, "slope2_upper_outlier", "long_name", "NC_STRING", "Upper Tukey threshold for slope2 outliers.")
+  att.put.nc(r_grp, "slope2_upper_outlier", "units", "NC_STRING", "m/m")
+  att.put.nc(r_grp, "slope2_upper_outlier", "_FillValue", "NC_DOUBLE", fill)
+  var.put.nc(r_grp, "slope2_upper_outlier", reach_outliers$S2_upper_outlier)
+  
+  var.def.nc(r_grp, "slope2_lower_outlier", "NC_DOUBLE", NA)
+  att.put.nc(r_grp, "slope2_lower_outlier", "long_name", "NC_STRING", "Lower Tukey threshold for slope2 outliers.")
+  att.put.nc(r_grp, "slope2_lower_outlier", "units", "NC_STRING", "m/m")
+  att.put.nc(r_grp, "slope2_lower_outlier", "_FillValue", "NC_DOUBLE", fill)
+  var.put.nc(r_grp, "slope2_lower_outlier", reach_outliers$S2_lower_outlier)
+  
   
 }
 
@@ -367,4 +416,53 @@ write_node_flags <- function(n_grp, node_flags, node_outliers,
   att.put.nc(n_grp, "d_x_area_flag", "flag_meanings", "NC_STRING", "not_overwritten overwritten")
   att.put.nc(n_grp, "d_x_area_flag", "_FillValue", "NC_INT", fill)
   var.put.nc(n_grp, "d_x_area_flag", node_dxa_flags)
+
+  var.def.nc(n_grp, "width_upper_outlier", "NC_DOUBLE", NA)
+  att.put.nc(n_grp, "width_upper_outlier", "long_name", "NC_STRING", "Upper Tukey threshold for width outliers.")
+  att.put.nc(n_grp, "width_upper_outlier", "units", "NC_STRING", "m")
+  att.put.nc(n_grp, "width_upper_outlier", "_FillValue", "NC_DOUBLE", fill)
+  var.put.nc(n_grp, "width_upper_outlier", node_outliers$W_upper_outlier)
+  
+  var.def.nc(n_grp, "width_lower_outlier", "NC_DOUBLE", NA)
+  att.put.nc(n_grp, "width_lower_outlier", "long_name", "NC_STRING", "Lower Tukey threshold for width outliers.")
+  att.put.nc(n_grp, "width_lower_outlier", "units", "NC_STRING", "m")
+  att.put.nc(n_grp, "width_lower_outlier", "_FillValue", "NC_DOUBLE", fill)
+  var.put.nc(n_grp, "width_lower_outlier", node_outliers$W_lower_outlier)
+  
+  var.def.nc(n_grp, "wse_upper_outlier", "NC_DOUBLE", NA)
+  att.put.nc(n_grp, "wse_upper_outlier", "long_name", "NC_STRING", "Upper Tukey threshold for wse outliers.")
+  att.put.nc(n_grp, "wse_upper_outlier", "units", "NC_STRING", "m")
+  att.put.nc(n_grp, "wse_upper_outlier", "_FillValue", "NC_DOUBLE", fill)
+  var.put.nc(n_grp, "wse_upper_outlier", node_outliers$H_upper_outlier)
+  
+  var.def.nc(n_grp, "wse_lower_outlier", "NC_DOUBLE", NA)
+  att.put.nc(n_grp, "wse_lower_outlier", "long_name", "NC_STRING", "Lower Tukey threshold for wse outliers.")
+  att.put.nc(n_grp, "wse_lower_outlier", "units", "NC_STRING", "m")
+  att.put.nc(n_grp, "wse_lower_outlier", "_FillValue", "NC_DOUBLE", fill)
+  var.put.nc(n_grp, "wse_lower_outlier", node_outliers$H_lower_outlier)
+  
+  var.def.nc(n_grp, "slope_upper_outlier", "NC_DOUBLE", NA)
+  att.put.nc(n_grp, "slope_upper_outlier", "long_name", "NC_STRING", "Upper Tukey threshold for slope outliers.")
+  att.put.nc(n_grp, "slope_upper_outlier", "units", "NC_STRING", "m/m")
+  att.put.nc(n_grp, "slope_upper_outlier", "_FillValue", "NC_DOUBLE", fill)
+  var.put.nc(n_grp, "slope_upper_outlier", node_outliers$S_upper_outlier)
+  
+  var.def.nc(n_grp, "slope_lower_outlier", "NC_DOUBLE", NA)
+  att.put.nc(n_grp, "slope_lower_outlier", "long_name", "NC_STRING", "Lower Tukey threshold for slope outliers.")
+  att.put.nc(n_grp, "slope_lower_outlier", "units", "NC_STRING", "m/m")
+  att.put.nc(n_grp, "slope_lower_outlier", "_FillValue", "NC_DOUBLE", fill)
+  var.put.nc(n_grp, "slope_lower_outlier", node_outliers$S_lower_outlier)
+  
+  var.def.nc(n_grp, "slope2_upper_outlier", "NC_DOUBLE", NA)
+  att.put.nc(n_grp, "slope2_upper_outlier", "long_name", "NC_STRING", "Upper Tukey threshold for slope2 outliers.")
+  att.put.nc(n_grp, "slope2_upper_outlier", "units", "NC_STRING", "m/m")
+  att.put.nc(n_grp, "slope2_upper_outlier", "_FillValue", "NC_DOUBLE", fill)
+  var.put.nc(n_grp, "slope2_upper_outlier", node_outliers$S2_upper_outlier)
+  
+  var.def.nc(n_grp, "slope2_lower_outlier", "NC_DOUBLE", NA)
+  att.put.nc(n_grp, "slope2_lower_outlier", "long_name", "NC_STRING", "Lower Tukey threshold for slope2 outliers.")
+  att.put.nc(n_grp, "slope2_lower_outlier", "units", "NC_STRING", "m/m")
+  att.put.nc(n_grp, "slope2_lower_outlier", "_FillValue", "NC_DOUBLE", fill)
+  var.put.nc(n_grp, "slope2_lower_outlier", node_outliers$S2_lower_outlier)
+  
                              }
